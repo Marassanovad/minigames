@@ -10,9 +10,9 @@ The project is developed according to the Rolling Scopes School requirements and
 
 ## Technologies
 
-* TypeScript
-* Vite
-* Sass
+- TypeScript
+- Vite
+- Sass
 
 ## Getting Started
 
