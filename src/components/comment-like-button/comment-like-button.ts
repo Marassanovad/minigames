@@ -1,4 +1,5 @@
 import likeIcon from '../../assets/icons/like.svg?raw';
+import './comment-like-button.scss';
 
 export function createCommentLikeButton(
   likesCount: number,

@@ -1,4 +1,5 @@
 import sendIcon from '../../assets/icons/send.svg?raw';
+import './send-button.scss';
 
 export function createSendButton(onClick: () => void): HTMLButtonElement {
   const button = document.createElement('button');

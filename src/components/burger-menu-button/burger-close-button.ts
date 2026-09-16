@@ -1,4 +1,5 @@
 import closeIcon from '../../assets/icons/close.svg?raw';
+import './burger-close-button.scss';
 
 export function createBurgerCloseButton(
   onClick: () => void,

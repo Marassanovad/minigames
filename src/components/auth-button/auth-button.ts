@@ -1,3 +1,5 @@
+import './auth-button.scss';
+
 type AuthButtonVariant = 'login' | 'logout' | 'signup';
 type AuthButtonTheme = 'light' | 'dark';
 

@@ -1,3 +1,5 @@
+import './comment-input.scss';
+
 export function createCommentInput(placeholder: string): HTMLDivElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'comment-input-wrapper';
