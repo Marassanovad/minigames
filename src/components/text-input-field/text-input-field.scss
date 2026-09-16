@@ -1,0 +1,97 @@
+@use '../../styles/tokens' as *;
+
+.text-input-field {
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  width: 356px;
+  height: 48px;
+  padding: 0 $spacing-2;
+  gap: $spacing-2;
+
+  background: $color-white;
+  border: 2px solid $color-black;
+  border-radius: $corner-small;
+
+  color: $color-on-primary;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 24px;
+    flex-shrink: 0;
+
+    color: $color-on-primary;
+
+    svg {
+      display: block;
+      width: 20px;
+      height: 24px;
+    }
+  }
+
+  &__input {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+
+    background: transparent;
+    border: none;
+    outline: none;
+
+    color: $color-on-primary;
+    font-family: $font-family-inter;
+    font-size: $font-size-body-small;
+    font-weight: $font-weight-medium;
+
+    &::placeholder {
+      color: $color-on-bg;
+      opacity: 1;
+    }
+  }
+
+  &.is-empty {
+    .text-input-field__icon {
+      color: $color-on-bg;
+    }
+  }
+
+  &:focus-within {
+    color: $color-on-primary;
+    background: $color-surface-low;
+    border-color: $color-on-primary;
+
+    .text-input-field__icon {
+      color: $color-on-primary;
+    }
+  }
+
+  &.is-error {
+    border-color: $color-error;
+
+    .text-input-field__icon {
+      color: $color-error;
+    }
+  }
+}
+.text-input-field-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-1;
+}
+
+.text-input-field__error {
+  color: $color-error;
+  font-family: $font-family-inter;
+  font-size: $font-size-label-medium;
+  font-weight: $font-weight-regular;
+}

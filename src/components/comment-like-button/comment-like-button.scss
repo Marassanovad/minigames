@@ -1,0 +1,35 @@
+@use '../../styles/tokens' as *;
+
+.comment-like-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-05;
+  padding: $spacing-05 $spacing-1;
+
+  color: $color-black;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-label-medium;
+
+  background: transparent;
+  border-radius: $corner-medium;
+  border: none;
+
+  cursor: pointer;
+
+  span {
+    height: 14px;
+  }
+
+  &:hover {
+    background: $color-surface;
+  }
+
+  &.is-liked {
+    color: $color-like;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}

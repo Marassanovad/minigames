@@ -1,0 +1,34 @@
+@use '../../styles/tokens' as *;
+
+.send-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: $button-icon;
+
+  background: $color-bg-footer;
+  border: none;
+  border-radius: $corner-small;
+
+  cursor: pointer;
+
+  span {
+    height: 24px;
+    width: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &:hover {
+    background: $color-tertiary;
+    border-color: $color-on-primary;
+  }
+
+  &:disabled {
+    background: $color-outline-variant;
+    cursor: not-allowed;
+    color: $color-on-bg;
+  }
+}
