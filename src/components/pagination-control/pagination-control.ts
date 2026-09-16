@@ -1,5 +1,6 @@
 import chevronBackwardIcon from '../../assets/icons/left.svg?raw';
 import chevronForwardIcon from '../../assets/icons/right.svg?raw';
+import './pagination-control.scss';
 
 interface PaginationControlOptions {
   currentPage: number;

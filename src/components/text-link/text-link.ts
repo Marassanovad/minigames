@@ -1,3 +1,5 @@
+import './text-link.scss';
+
 export function createTextLink(
   content: string,
   href: string,

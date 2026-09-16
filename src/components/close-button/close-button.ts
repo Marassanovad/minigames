@@ -1,4 +1,5 @@
 import closeIcon from '../../assets/icons/close.svg?raw';
+import './close-button.scss';
 
 export function createCloseButton(onClick: () => void): HTMLButtonElement {
   const button = document.createElement('button');

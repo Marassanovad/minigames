@@ -1,3 +1,5 @@
+import './filter-chip.scss';
+
 interface FilterChipOptions {
   label: string;
   isActive?: boolean;

@@ -1,3 +1,5 @@
+import './mobile-menu.scss';
+
 export function createMobileMenu(
   content: string,
   href: string,

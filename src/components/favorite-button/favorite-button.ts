@@ -1,4 +1,5 @@
 import likeIcon from '../../assets/icons/like.svg?raw';
+import './favorite-button.scss';
 
 type FavoriteButtonVariant = 'icon' | 'text';
 

@@ -1,3 +1,5 @@
+import './footer-link.scss';
+
 type FooterLinkVariant = 'text' | 'icon';
 
 export function createFooterLink(

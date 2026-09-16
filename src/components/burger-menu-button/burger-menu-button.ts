@@ -1,4 +1,5 @@
 import burgerMenuIcon from '../../assets/icons/burger-menu.svg?raw';
+import './burger-menu-button.scss';
 
 export function createBurgerMenuButton(onClick: () => void): HTMLButtonElement {
   const button = document.createElement('button');

@@ -1,4 +1,5 @@
 import mailIcon from '../../assets/icons/mail.svg?raw';
+import './text-input-field.scss';
 
 interface TextInputFieldOptions {
   value?: string;
