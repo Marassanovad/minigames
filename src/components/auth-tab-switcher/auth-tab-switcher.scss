@@ -1,0 +1,38 @@
+@use '../../styles/tokens' as *;
+
+.auth-tab-switcher {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: $color-white;
+  color: $color-on-bg;
+  border: 2px solid $color-black;
+  border-radius: $corner-medium;
+
+  &__tab {
+    border: none;
+    border-radius: $corner-small;
+    background: transparent;
+    padding: 11px $spacing-8;
+
+    font-size: $font-size-body-medium;
+    font-weight: $font-weight-bold;
+
+    cursor: pointer;
+
+    transition:
+      background 0.25s ease,
+      color 0.25s ease;
+
+    &:not(.is-active):hover {
+      background: $color-surface;
+    }
+
+    &.is-active {
+      background: $color-bg-footer-low;
+      color: $color-white;
+    }
+  }
+}

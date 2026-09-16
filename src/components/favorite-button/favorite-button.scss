@@ -1,0 +1,56 @@
+@use '../../styles/tokens' as *;
+
+.favorite-button {
+  box-sizing: border-box;
+  height: 48px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  gap: $spacing-1;
+
+  background: $color-white;
+  border: 1px solid $color-outline-variant;
+  box-shadow: $shadow-level-1;
+  border-radius: $corner-medium;
+
+  &:hover {
+    background: $color-surface;
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+    width: 20px;
+
+    svg {
+      display: block;
+    }
+  }
+
+  &__text {
+    font-weight: $font-weight-bold;
+    font-size: $font-size-body-medium;
+  }
+
+  &--icon {
+    width: 48px;
+    padding: $button-icon;
+  }
+
+  &--text {
+    width: 268px;
+    padding: $button-large-padding;
+  }
+
+  &.is-favorite {
+    .favorite-button__icon {
+      color: $color-like;
+    }
+  }
+}

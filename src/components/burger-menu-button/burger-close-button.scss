@@ -1,0 +1,35 @@
+@use '../../styles/tokens' as *;
+
+.burger-close-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: $button-icon;
+
+  background: $color-bg-footer-low;
+  color: $color-white;
+  border: none;
+  border-radius: $corner-small;
+
+  cursor: pointer;
+
+  span {
+    height: 16px;
+    width: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &:hover {
+    background: $color-bg-footer-lowest;
+    border: $color-primary 2px solid;
+  }
+
+  &:disabled {
+    background: $color-outline-variant;
+    cursor: not-allowed;
+    color: $color-on-bg;
+  }
+}

@@ -1,0 +1,34 @@
+@use '../../styles/tokens' as *;
+
+.filter-chip {
+  box-sizing: border-box;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: $button-small-padding;
+
+  background: $color-white;
+  border: 2px solid $color-black;
+  border-radius: $corner-full;
+
+  color: $color-on-primary;
+  font-size: $font-size-body-small;
+  font-weight: $font-weight-bold;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background: $color-surface;
+  }
+
+  &.is-active {
+    background: $color-primary;
+  }
+}
