@@ -2,6 +2,7 @@ import { createAuthButton } from '../auth-button/auth-button';
 import { createBurgerMenuButton } from '../burger-menu-button/burger-menu-button';
 import './header.scss';
 import logoIcon from '../../assets/icons/logo.svg';
+import { navigationLinks } from '../../app/navigation-links.ts';
 
 interface HeaderOptions {
   userName?: string;
@@ -89,26 +90,7 @@ function createNavigation(): HTMLElement {
   navigation.className = 'header__navigation';
   const currentPath = window.location.pathname;
 
-  const links = [
-    {
-      label: 'Home',
-      href: '/',
-    },
-    {
-      label: 'Library',
-      href: '/library',
-    },
-    {
-      label: 'Tournaments',
-      href: '/tournaments',
-    },
-    {
-      label: 'Community',
-      href: '/community',
-    },
-  ];
-
-  links.forEach(({ label, href }) => {
+  navigationLinks.forEach(({ label, href }) => {
     const link = document.createElement('a');
 
     link.className = 'header__nav-link';
