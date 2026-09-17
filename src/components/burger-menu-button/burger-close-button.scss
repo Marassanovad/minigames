@@ -9,7 +9,7 @@
 
   background: $color-bg-footer-low;
   color: $color-white;
-  border: none;
+  border: transparent 2px solid;
   border-radius: $corner-small;
 
   cursor: pointer;
@@ -24,7 +24,7 @@
 
   &:hover {
     background: $color-bg-footer-lowest;
-    border: $color-primary 2px solid;
+    border-color: $color-primary;
   }
 
   &:disabled {
