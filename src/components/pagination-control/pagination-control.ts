@@ -6,52 +6,73 @@ interface PaginationControlOptions {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  hidePages?: boolean;
+  isLoop?: boolean;
 }
 
 export function createPaginationControl({
   currentPage,
   totalPages,
   onPageChange,
+  hidePages = false,
+  isLoop = false,
 }: PaginationControlOptions): HTMLDivElement {
-  // const container = document.createElement('div');
-  //
-  // container.className = 'pagination-control';
-
   const controls = document.createElement('div');
 
   controls.className = 'pagination-control';
 
+  let activePage = currentPage;
+
   const prevButton = createArrowButton('Previous page', chevronBackwardIcon);
 
-  prevButton.disabled = currentPage === 1;
+  prevButton.disabled = !isLoop && activePage === 1;
 
   prevButton.addEventListener('click', () => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
+    if (isLoop) {
+      activePage = activePage === 1 ? totalPages : activePage - 1;
+
+      onPageChange(activePage);
+      return;
+    }
+
+    if (activePage > 1) {
+      activePage -= 1;
+      onPageChange(activePage);
     }
   });
 
   controls.append(prevButton);
 
-  const pages = getVisiblePages(currentPage, totalPages);
+  if (!hidePages) {
+    const pages = getVisiblePages(activePage, totalPages);
 
-  pages.forEach((page) => {
-    const pageButton = createPageButton(page, page === currentPage);
+    pages.forEach((page) => {
+      const pageButton = createPageButton(page, page === activePage);
 
-    pageButton.addEventListener('click', () => {
-      onPageChange(page);
+      pageButton.addEventListener('click', () => {
+        activePage = page;
+        onPageChange(activePage);
+      });
+
+      controls.append(pageButton);
     });
-
-    controls.append(pageButton);
-  });
+  }
 
   const nextButton = createArrowButton('Next page', chevronForwardIcon);
 
-  nextButton.disabled = currentPage === totalPages;
+  nextButton.disabled = !isLoop && activePage === totalPages;
 
   nextButton.addEventListener('click', () => {
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1);
+    if (isLoop) {
+      activePage = activePage === totalPages ? 1 : activePage + 1;
+
+      onPageChange(activePage);
+      return;
+    }
+
+    if (activePage < totalPages) {
+      activePage += 1;
+      onPageChange(activePage);
     }
   });
 

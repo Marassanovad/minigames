@@ -9,18 +9,20 @@ const buttonLabels: Record<PlayOrDetailsButtonVariant, string> = {
 
 interface PlayOrDetailsButtonOptions {
   variant: PlayOrDetailsButtonVariant;
+  title?: string;
   onClick: () => void;
 }
 
 export function createPlayOrDetailsButton({
   variant,
   onClick,
+  title,
 }: PlayOrDetailsButtonOptions): HTMLButtonElement {
   const button = document.createElement('button');
 
   button.type = 'button';
   button.className = `play-or-details-button play-or-details-button--${variant}`;
-  button.textContent = buttonLabels[variant];
+  button.textContent = title ?? buttonLabels[variant];
 
   button.addEventListener('click', onClick);
 
