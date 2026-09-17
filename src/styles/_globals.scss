@@ -20,6 +20,9 @@ body {
   color: $color-on-primary;
   background: $color-white;
 }
+main {
+  background: $color-background;
+}
 
 h1,
 h2,
@@ -33,6 +36,12 @@ ol,
 figure {
   margin: 0;
   padding: 0;
+}
+
+h2 {
+  color: $color-on-primary;
+  font-size: $font-size-headline-large;
+  font-weight: $font-weight-bold;
 }
 
 ul,
@@ -62,4 +71,15 @@ img,
 svg {
   display: block;
   max-width: 100%;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  h2 {
+    font-size: $font-size-headline-medium;
+  }
+}
+@media (max-width: 767px) {
+  h2 {
+    font-size: $font-size-headline-medium;
+  }
 }

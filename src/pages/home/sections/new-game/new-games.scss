@@ -1,0 +1,66 @@
+@use '../../../../styles/tokens' as *;
+
+.new-games {
+  width: 100%;
+  padding: $spacing-5 $spacing-15;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: $spacing-5;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: $spacing-1;
+
+    &-bar {
+      box-sizing: border-box;
+      width: $spacing-1;
+      height: $spacing-4;
+
+      background: $color-primary;
+      border: 1.5px solid $color-on-primary;
+      border-radius: $corner-extra-small;
+    }
+  }
+
+  &__track {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-1;
+  }
+}
+@media (min-width: 1024px) {
+  .pagination-control__arrow {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .new-games {
+    padding: $spacing-3 $spacing-5;
+    gap: $spacing-3;
+
+    &__title {
+      &-bar {
+        box-sizing: border-box;
+        width: $spacing-1;
+        height: $spacing-3;
+      }
+    }
+  }
+}
+@media (max-width: 767px) {
+  .new-games {
+    padding: $spacing-2 $spacing-2;
+    gap: $spacing-2;
+  }
+}

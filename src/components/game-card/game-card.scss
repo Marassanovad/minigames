@@ -1,0 +1,147 @@
+@use '../../styles/tokens' as *;
+
+.game-card {
+  --shadow-color: #{$color-on-primary};
+
+  box-sizing: border-box;
+  position: relative;
+
+  flex: 0 0 7.14%;
+  width: 7.14%;
+  height: 384px;
+
+  overflow: hidden;
+
+  background: $color-white;
+  border: 2.5px solid $color-on-primary;
+  box-shadow: $shadow-level-1;
+  border-radius: $corner-extra-large;
+
+  transition:
+    width 300ms ease,
+    flex-basis 300ms ease;
+
+  &--far {
+    flex-basis: 7.14%;
+    width: 7.14%;
+
+    .game-card__overlay {
+      display: none;
+    }
+  }
+
+  &--near {
+    flex-basis: 17.14%;
+    width: 17.14%;
+  }
+
+  &--selected {
+    flex-basis: 48.57%;
+    width: 48.57%;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+  }
+
+  &__overlay {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-1;
+
+    padding: $spacing-2;
+
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.4) 17.31%,
+      rgba(0, 0, 0, 0.85) 46.15%
+    );
+  }
+
+  &__name {
+    color: $color-white;
+    font-size: $font-size-body-large;
+    font-weight: $font-weight-bold;
+  }
+
+  &__stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__rating,
+  &__likes {
+    display: flex;
+    align-items: center;
+    gap: $spacing-05;
+    color: $color-white;
+    font-family: $font-family-inter;
+    font-size: $font-size-body-medium;
+    font-weight: $font-weight-bold;
+
+    svg {
+      color: $color-like;
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .game-card {
+    height: 288px;
+
+    &--selected {
+      flex-basis: 68%;
+      width: 68%;
+    }
+
+    &--near {
+      flex-basis: 16%;
+      width: 16%;
+      .game-card__overlay {
+        display: none;
+      }
+    }
+
+    &--far {
+      display: none;
+    }
+  }
+}
+@media (max-width: 767px) {
+  .game-card {
+    height: 206px;
+
+    &--selected {
+      flex-basis: 66%;
+      width: 66%;
+    }
+
+    &--near {
+      flex-basis: 16%;
+      width: 16%;
+      .game-card__overlay {
+        display: none;
+      }
+    }
+
+    &--far {
+      display: none;
+    }
+
+    &__name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
