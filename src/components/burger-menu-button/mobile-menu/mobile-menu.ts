@@ -8,10 +8,16 @@ import { createAuthButton } from '../../auth-button/auth-button.ts';
 
 interface MobileMenuOptions {
   isAuthenticated: boolean;
+  onLogin?: () => void;
+  onSignup?: () => void;
+  onLogout?: () => void;
 }
 
 export function createMobileMenu({
   isAuthenticated,
+  onLogin = () => {},
+  onSignup = () => {},
+  onLogout = () => {},
 }: MobileMenuOptions): HTMLElement {
   const menu = document.createElement('aside');
   menu.className = 'mobile-menu';
@@ -41,13 +47,13 @@ export function createMobileMenu({
   actions.className = 'mobile-menu__actions';
 
   if (!isAuthenticated) {
-    const login = createAuthButton('login', () => {}, 'dark');
+    const login = createAuthButton('login', onLogin, 'dark');
 
-    const signup = createAuthButton('signup', () => {}, 'light');
+    const signup = createAuthButton('signup', onSignup, 'light');
 
     actions.append(login, signup);
   } else {
-    const logout = createAuthButton('logout', () => {}, 'dark');
+    const logout = createAuthButton('logout', onLogout, 'dark');
     actions.append(logout);
   }
 

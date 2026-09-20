@@ -1,4 +1,4 @@
-@use '../../styles/tokens' as *;
+@use '../../../styles/tokens' as *;
 
 .text-input-field {
   box-sizing: border-box;
@@ -17,6 +17,13 @@
 
   color: $color-on-primary;
 
+  &__label {
+    font-weight: $font-weight-bold;
+    color: $color-on-primary;
+    font-size: $font-size-body-small;
+    margin-right: auto;
+  }
+
   &__icon {
     display: inline-flex;
     align-items: center;
@@ -30,8 +37,8 @@
 
     svg {
       display: block;
-      width: 20px;
-      height: 24px;
+      width: 16px;
+      height: 20px;
     }
   }
 

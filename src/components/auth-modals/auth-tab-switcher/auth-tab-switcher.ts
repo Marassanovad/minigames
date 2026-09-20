@@ -1,6 +1,6 @@
 import './auth-tab-switcher.scss';
 
-type AuthTab = 'login' | 'register';
+export type AuthTab = 'login' | 'register';
 
 export function createAuthTabSwitcher(
   activeTab: AuthTab,

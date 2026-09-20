@@ -4,6 +4,7 @@ import './header.scss';
 import logoIcon from '../../assets/icons/logo.svg';
 import { navigationLinks } from '../../data/navigation-links.ts';
 import {
+  closeMenu,
   createMobileMenu,
   openMenu,
 } from '../burger-menu-button/mobile-menu/mobile-menu.ts';
@@ -63,6 +64,18 @@ export function createHeader({
 
   const mobileMenu = createMobileMenu({
     isAuthenticated,
+    onLogin: () => {
+      closeMenu(mobileMenu);
+      onLogin();
+    },
+    onSignup: () => {
+      closeMenu(mobileMenu);
+      onSignup();
+    },
+    onLogout: () => {
+      closeMenu(mobileMenu);
+      onLogout();
+    },
   });
 
   const burgerButton = createBurgerMenuButton(() => {
