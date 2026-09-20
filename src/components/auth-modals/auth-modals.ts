@@ -114,9 +114,7 @@ export function createAuthModal(initialTab: AuthTab = 'login'): AuthModal {
 
     const divider = createDivider();
 
-    const googleButton = createGoogleButton(() => {
-      console.log('Login with Google');
-    });
+    const googleButton = createGoogleButton(() => {});
 
     form.append(
       emailField,
@@ -167,15 +165,13 @@ export function createAuthModal(initialTab: AuthTab = 'login'): AuthModal {
 
     const registerButton = createPlayOrDetailsButton({
       variant: 'play',
-      title: 'Login',
+      title: 'Create Account',
       onClick: () => {},
     });
 
     const divider = createDivider();
 
-    const googleButton = createGoogleButton(() => {
-      console.log('Login with Google');
-    });
+    const googleButton = createGoogleButton(() => {});
 
     form.append(
       usernameField,

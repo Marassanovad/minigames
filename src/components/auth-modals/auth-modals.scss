@@ -1,13 +1,25 @@
 @use '../../styles/tokens' as *;
 
 .auth-modal {
-  width: 420px;
+  width: calc(100% - $spacing-2);
+  max-width: 420px;
   background: $color-background;
   padding: $spacing-4;
 
   border: 3px solid $color-on-primary;
   border-radius: $corner-extra-large;
   box-shadow: $shadow-level-3;
+
+  opacity: 0;
+  transform: scale(0.95) translateY(10px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+
+  &[open] {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.6);
@@ -43,6 +55,7 @@
     .text-link {
       margin-left: auto;
     }
+
     .play-or-details-button {
       width: 100%;
     }
