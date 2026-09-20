@@ -21,22 +21,14 @@ export function initRouter(): void {
   window.addEventListener('popstate', () => renderPage(app));
 }
 
-function getRoutePath(): string {
+function renderPage(app: HTMLElement): void {
   const pathname = window.location.pathname;
 
-  if (pathname === BASE_PATH || pathname === `${BASE_PATH}/`) {
-    return '/';
-  }
+  const path =
+    pathname === BASE_PATH || pathname === `${BASE_PATH}/`
+      ? '/'
+      : pathname.replace(BASE_PATH, '');
 
-  if (pathname.startsWith(`${BASE_PATH}/`)) {
-    return pathname.slice(BASE_PATH.length);
-  }
-
-  return pathname;
-}
-
-function renderPage(app: HTMLElement): void {
-  const path = getRoutePath();
   const render = routes[path] ?? renderHomePage;
 
   app.replaceChildren(render());
@@ -59,17 +51,8 @@ function handleNavigation(event: MouseEvent): void {
     return;
   }
 
-  const href = link.getAttribute('href');
-
-  if (!href || !href.startsWith('/')) {
-    return;
-  }
-
   event.preventDefault();
 
-  const path = href === '/' ? '' : href;
-  const url = `${BASE_PATH}${path}`;
-
-  window.history.pushState({}, '', url);
+  window.history.pushState({}, '', link.pathname);
   window.dispatchEvent(new PopStateEvent('popstate'));
 }
