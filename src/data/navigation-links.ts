@@ -3,21 +3,21 @@ export interface NavigationLink {
   href: string;
 }
 
-export const navigationLinks = [
+export const navigationLinks: NavigationLink[] = [
   {
     label: 'Home',
-    href: '/',
+    href: '/minigames/',
   },
   {
     label: 'Library',
-    href: '/library',
+    href: '/minigames/library',
   },
   {
     label: 'Tournaments',
-    href: '/tournaments',
+    href: '/minigames/tournaments',
   },
   {
     label: 'Community',
-    href: '/community',
+    href: '/minigames/community',
   },
 ];
