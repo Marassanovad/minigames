@@ -1,0 +1,19 @@
+@use '../../styles/tokens' as *;
+
+.menu-link {
+  font-weight: $font-weight-medium;
+  font-size: $font-size-body-large;
+  color: $color-on-bg-footer;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-primary;
+    text-decoration: underline;
+  }
+
+  &.is-active {
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+  }
+}

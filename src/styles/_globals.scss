@@ -1,0 +1,85 @@
+@use './tokens' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+
+  font-family: $font-family-inter;
+  color: $color-on-primary;
+  background: $color-white;
+}
+main {
+  background: $color-background;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+figure {
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  color: $color-on-primary;
+  font-size: $font-size-headline-large;
+  font-weight: $font-weight-bold;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+input,
+textarea,
+select {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  h2 {
+    font-size: $font-size-headline-medium;
+  }
+}
+@media (max-width: 767px) {
+  h2 {
+    font-size: $font-size-headline-medium;
+  }
+}

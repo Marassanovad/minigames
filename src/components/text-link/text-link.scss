@@ -1,0 +1,13 @@
+@use '../../styles/tokens' as *;
+
+.text-link {
+  font-weight: $font-weight-bold;
+  font-size: $font-size-body-small;
+  text-decoration: underline;
+  color: $color-on-primary;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-tertiary;
+  }
+}

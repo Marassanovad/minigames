@@ -1,0 +1,30 @@
+@use '../../styles/tokens' as *;
+
+.play-or-details-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $button-small-padding;
+
+  border: 2px solid $color-black;
+  border-radius: $corner-small;
+  background: $color-primary;
+
+  color: $color-on-primary;
+  font-size: $font-size-body-small;
+  font-weight: $font-weight-bold;
+
+  cursor: pointer;
+
+  &:hover {
+    background: $color-primary-high;
+  }
+
+  &--play {
+    width: 248px;
+    height: 48px;
+    border-radius: $corner-medium;
+    padding: $button-large-padding;
+    box-shadow: $shadow-level-1;
+  }
+}

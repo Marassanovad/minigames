@@ -1,0 +1,118 @@
+@use '../../styles/tokens' as *;
+
+.header {
+  width: 100%;
+  height: $spacing-11;
+  background: $color-background;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 $spacing-10;
+  border-bottom: 2px solid #111111;
+
+  &__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-1;
+    font-weight: $font-weight-bold;
+    font-size: $font-size-headline-medium;
+  }
+
+  &__nav-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+  }
+
+  &__navigation {
+    display: flex;
+    align-items: center;
+    gap: $spacing-5;
+  }
+
+  &__nav-link {
+    font-weight: $font-weight-medium;
+    font-size: $font-size-body-medium;
+    color: $color-on-bg;
+
+    &.is-active {
+      color: $color-on-primary;
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: $spacing-1;
+    color: $color-on-primary;
+    font-size: $font-size-body-medium;
+    font-weight: $font-weight-bold;
+  }
+  &__user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: $color-on-primary;
+    border-radius: $corner-full;
+    color: $color-white;
+    font-size: $font-size-body-small;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+  }
+
+  &__burger-menu {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .header {
+    padding: 0 $spacing-5;
+    height: $spacing-9;
+
+    &__logo {
+      font-size: $font-size-headline-small;
+    }
+
+    &__nav-actions {
+      gap: $spacing-2;
+    }
+
+    &__navigation,
+    &__actions .auth-button--login,
+    &__user {
+      display: none;
+    }
+
+    &__burger-menu {
+      display: flex;
+      color: $color-white;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .header {
+    padding: 0 $spacing-5;
+    height: $spacing-8;
+
+    &__navigation,
+    .auth-button--logout,
+    &__actions,
+    &__user {
+      display: none;
+    }
+
+    &__burger-menu {
+      display: flex;
+      color: $color-white;
+    }
+  }
+}

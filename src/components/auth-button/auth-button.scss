@@ -1,0 +1,47 @@
+@use '../../styles/tokens' as *;
+
+.auth-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $button-medium-padding;
+
+  background: transparent;
+  border: 2px solid $color-black;
+  border-radius: $corner-small;
+
+  color: $color-on-primary;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-label-large;
+
+  &--login:hover {
+    background: $color-surface;
+  }
+
+  &--logout {
+    background: $color-white;
+
+    &:hover {
+      background: $color-primary-low;
+    }
+  }
+
+  &--signup {
+    background: $color-primary;
+
+    &:hover {
+      background: $color-primary-high;
+    }
+  }
+
+  &--dark {
+    background: transparent;
+    border: 2px solid $color-white;
+    color: $color-white;
+
+    &:hover {
+      background: transparent;
+      border-color: $color-primary;
+    }
+  }
+}

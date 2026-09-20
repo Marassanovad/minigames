@@ -1,0 +1,60 @@
+@use '../../styles/tokens' as *;
+
+.comment-input-wrapper {
+  box-sizing: border-box;
+
+  min-width: 318px;
+  min-height: 48px;
+  max-height: 88px;
+  width: 100%;
+
+  padding: $button-small-padding;
+
+  background: $color-white;
+  border: 1px solid $color-black;
+  border-radius: $corner-small;
+
+  overflow: hidden;
+}
+
+.comment-input {
+  box-sizing: border-box;
+
+  min-height: 30px;
+  max-height: 70px;
+
+  padding: 0;
+
+  background: transparent;
+  border: none;
+
+  font-family: $font-family-inter;
+  font-size: $font-size-body-small;
+  font-weight: $font-weight-regular;
+  color: $color-on-primary;
+
+  resize: none;
+  overflow-y: auto;
+
+  &::placeholder {
+    color: $color-placeholder;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #ebebeb;
+    border-radius: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #a0a0a0;
+    border-radius: 2px;
+  }
+}
