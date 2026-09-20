@@ -1,0 +1,50 @@
+@use '../../../../styles/tokens' as *;
+
+.page-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  padding: $spacing-5 $spacing-15;
+  gap: $spacing-1;
+
+  h1 {
+    color: $color-on-primary;
+    font-size: $font-size-display-large;
+    font-weight: $font-weight-bold;
+  }
+
+  p {
+    color: $color-on-bg;
+    font-size: $font-size-body-large;
+    font-weight: $font-weight-medium;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page-title {
+    padding: $spacing-3 $spacing-5;
+
+    h1 {
+      font-size: $font-size-display-medium;
+    }
+
+    p {
+      font-size: $font-size-body-medium;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .page-title {
+    padding: $spacing-2;
+
+    h1 {
+      font-size: $font-size-display-small;
+    }
+
+    p {
+      font-size: $font-size-body-small;
+    }
+  }
+}
