@@ -1,7 +1,7 @@
 import { renderHomePage } from '../pages/home/home-page';
 import { renderLibraryPage } from '../pages/library/library-page';
 
-const BASE_PATH = import.meta.env.BASE_URL.replace(/\/$/, '');
+const BASE_PATH = import.meta.env.VITE_BASE_PATH;
 
 const routes: Record<string, () => HTMLElement> = {
   '/': renderHomePage,
