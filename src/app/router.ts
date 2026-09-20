@@ -1,7 +1,7 @@
 import { renderHomePage } from '../pages/home/home-page';
 import { renderLibraryPage } from '../pages/library/library-page';
 
-const BASE_PATH = import.meta.env.VITE_BASE_PATH;
+const BASE_PATH = '/minigames';
 
 const routes: Record<string, () => HTMLElement> = {
   '/': renderHomePage,
@@ -24,11 +24,15 @@ export function initRouter(): void {
 function getRoutePath(): string {
   const pathname = window.location.pathname;
 
-  if (BASE_PATH && pathname.startsWith(BASE_PATH)) {
-    return pathname.slice(BASE_PATH.length) || '/';
+  if (pathname === BASE_PATH || pathname === `${BASE_PATH}/`) {
+    return '/';
   }
 
-  return pathname || '/';
+  if (pathname.startsWith(`${BASE_PATH}/`)) {
+    return pathname.slice(BASE_PATH.length);
+  }
+
+  return pathname;
 }
 
 function renderPage(app: HTMLElement): void {
@@ -55,17 +59,17 @@ function handleNavigation(event: MouseEvent): void {
     return;
   }
 
-  const linkPath = link.pathname;
+  const href = link.getAttribute('href');
 
-  if (!linkPath.startsWith(BASE_PATH)) {
+  if (!href || !href.startsWith('/')) {
     return;
   }
 
   event.preventDefault();
 
-  const routePath = linkPath.slice(BASE_PATH.length) || '/';
+  const path = href === '/' ? '' : href;
+  const url = `${BASE_PATH}${path}`;
 
-  window.history.pushState({}, '', `${BASE_PATH}${routePath}`);
-
+  window.history.pushState({}, '', url);
   window.dispatchEvent(new PopStateEvent('popstate'));
 }
