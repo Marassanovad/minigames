@@ -7,7 +7,7 @@ import shareIcon from '../../assets/icons/share.svg?raw';
 import feedIcon from '../../assets/icons/feed.svg?raw';
 import chatIcon from '../../assets/icons/chat.svg?raw';
 import { createFooterLink } from '../footer-link/footer-link.ts';
-import { navigationLinks } from '../../app/navigation-links.ts';
+import { navigationLinks } from '../../data/navigation-links.ts';
 
 export function createFooter(): HTMLElement {
   const footer = document.createElement('footer');

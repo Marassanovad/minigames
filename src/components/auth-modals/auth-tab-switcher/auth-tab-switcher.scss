@@ -1,6 +1,7 @@
-@use '../../styles/tokens' as *;
+@use '../../../styles/tokens' as *;
 
 .auth-tab-switcher {
+  width: 100%;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -12,10 +13,11 @@
   border-radius: $corner-medium;
 
   &__tab {
+    width: 100%;
     border: none;
     border-radius: $corner-small;
     background: transparent;
-    padding: 11px $spacing-8;
+    padding: $button-large-padding;
 
     font-size: $font-size-body-medium;
     font-weight: $font-weight-bold;

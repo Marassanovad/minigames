@@ -1,52 +1,85 @@
-import mailIcon from '../../assets/icons/mail.svg?raw';
+import mailIcon from '../../../assets/icons/mail.svg?raw';
+import userIcon from '../../../assets/icons/person.svg?raw';
+import passwordIcon from '../../../assets/icons/lock.svg?raw';
 import './text-input-field.scss';
 
+type TextInputType = 'text' | 'email' | 'password';
+
 interface TextInputFieldOptions {
+  label?: string;
+  type?: TextInputType;
+  icon?: TextInputType;
   value?: string;
   placeholder?: string;
+  autocomplete?: HTMLInputElement['autocomplete'];
   onChange?: (value: string) => void;
   onValidChange?: (isValid: boolean) => void;
 }
 
+const icons: Record<TextInputType, string> = {
+  email: mailIcon,
+  text: userIcon,
+  password: passwordIcon,
+};
+
 export function createTextInputField({
+  label = '',
+  type = 'text',
+  icon = 'email',
   value = '',
-  placeholder = 'e.g. alex@minigames.com',
+  placeholder = '',
+  autocomplete,
   onChange,
   onValidChange,
 }: TextInputFieldOptions = {}): HTMLDivElement {
   const container = document.createElement('div');
   container.className = 'text-input-field-container';
 
+  if (label) {
+    const labelElement = document.createElement('label');
+    labelElement.className = 'text-input-field__label';
+    labelElement.textContent = label;
+
+    container.append(labelElement);
+  }
+
   const wrapper = document.createElement('div');
   wrapper.className = 'text-input-field';
 
-  const icon = document.createElement('span');
-  icon.className = 'text-input-field__icon';
-  icon.innerHTML = mailIcon;
+  const iconElement = document.createElement('span');
+  iconElement.className = 'text-input-field__icon';
+  iconElement.innerHTML = icons[icon];
 
   const input = document.createElement('input');
 
-  input.type = 'email';
+  input.type = type;
   input.className = 'text-input-field__input';
   input.placeholder = placeholder;
   input.value = value;
-  input.autocomplete = 'email';
+
+  if (autocomplete) {
+    input.autocomplete = autocomplete;
+  }
 
   const errorMessage = document.createElement('span');
   errorMessage.className = 'text-input-field__error';
-  errorMessage.textContent = 'Please enter a valid email address';
+  errorMessage.textContent = 'Please enter a valid data';
   errorMessage.hidden = true;
 
   let hasBeenTouched = false;
 
   function validate(): boolean {
-    const email = input.value.trim();
+    const inputValue = input.value.trim();
 
-    if (!email) {
+    if (!inputValue) {
       return false;
     }
 
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (type === 'email') {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputValue);
+    }
+
+    return true;
   }
 
   function updateValidation(): void {
@@ -56,7 +89,7 @@ export function createTextInputField({
 
     wrapper.classList.toggle('is-valid', hasBeenTouched && isValid);
 
-    errorMessage.hidden = !hasBeenTouched || isValid;
+    errorMessage.hidden = type !== 'email' || !hasBeenTouched || isValid;
 
     onValidChange?.(isValid);
   }
@@ -78,8 +111,7 @@ export function createTextInputField({
     updateValidation();
   });
 
-  wrapper.append(icon, input);
-
+  wrapper.append(iconElement, input);
   container.append(wrapper, errorMessage);
 
   return container;

@@ -2,7 +2,12 @@ import { createAuthButton } from '../auth-button/auth-button';
 import { createBurgerMenuButton } from '../burger-menu-button/burger-menu-button';
 import './header.scss';
 import logoIcon from '../../assets/icons/logo.svg';
-import { navigationLinks } from '../../app/navigation-links.ts';
+import { navigationLinks } from '../../data/navigation-links.ts';
+import {
+  closeMenu,
+  createMobileMenu,
+  openMenu,
+} from '../burger-menu-button/mobile-menu/mobile-menu.ts';
 
 interface HeaderOptions {
   userName?: string;
@@ -57,9 +62,31 @@ export function createHeader({
     navActions.append(actions);
   }
 
-  const burgerButton = createBurgerMenuButton(onMenuClick);
-  burgerButton.className = 'header__burger-menu';
+  const mobileMenu = createMobileMenu({
+    isAuthenticated,
+    onLogin: () => {
+      closeMenu(mobileMenu);
+      onLogin();
+    },
+    onSignup: () => {
+      closeMenu(mobileMenu);
+      onSignup();
+    },
+    onLogout: () => {
+      closeMenu(mobileMenu);
+      onLogout();
+    },
+  });
+
+  const burgerButton = createBurgerMenuButton(() => {
+    openMenu(mobileMenu);
+    onMenuClick();
+  });
+  burgerButton.classList.add('header__burger-menu');
+
   navActions.append(burgerButton);
+
+  document.body.append(mobileMenu);
 
   header.append(logo, navActions);
 

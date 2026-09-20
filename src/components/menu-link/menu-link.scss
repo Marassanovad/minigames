@@ -1,21 +1,19 @@
 @use '../../styles/tokens' as *;
 
-.mobile-menu {
+.menu-link {
   font-weight: $font-weight-medium;
-  font-size: $font-size-body-small;
+  font-size: $font-size-body-large;
   color: $color-on-bg-footer;
   text-decoration: none;
   cursor: pointer;
 
   &:hover {
     color: $color-primary;
-    font-size: $font-size-body-large;
     text-decoration: underline;
   }
 
   &.is-active {
     font-weight: $font-weight-bold;
-    font-size: $font-size-body-large;
     color: $color-primary;
   }
 }

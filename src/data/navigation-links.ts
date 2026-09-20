@@ -1,3 +1,8 @@
+export interface NavigationLink {
+  label: string;
+  href: string;
+}
+
 export const navigationLinks = [
   {
     label: 'Home',
