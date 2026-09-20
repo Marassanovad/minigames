@@ -1,0 +1,100 @@
+@use '../../../styles/tokens' as *;
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: $spacing-3 $spacing-4;
+  gap: $spacing-3;
+
+  background: $color-bg-footer;
+  border-left: 2px solid $color-outline-variant;
+
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+
+  &--open {
+    transform: translateX(0);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: $spacing-1;
+
+    font-size: $font-size-headline-small;
+    font-weight: $font-weight-bold;
+    color: $color-white;
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3;
+    flex: 1;
+  }
+
+  &__link {
+    color: $color-on-bg;
+    font-size: $font-size-body-large;
+    font-weight: $font-weight-medium;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-2;
+  }
+
+  &__action {
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 10px 20px;
+
+    border: 2px solid $color-white;
+    border-radius: $corner-small;
+
+    color: $color-white;
+    font-size: $font-size-body-small;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
+  }
+
+  &__signup {
+    background: $color-primary;
+    border-color: $color-on-primary;
+    color: $color-on-primary;
+  }
+
+  .auth-button {
+    width: 100%;
+  }
+}
+
+.menu-open {
+  overflow: hidden;
+}
