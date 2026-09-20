@@ -3,9 +3,10 @@
 .comment-input-wrapper {
   box-sizing: border-box;
 
-  width: 318px;
+  min-width: 318px;
   min-height: 48px;
   max-height: 88px;
+  width: 100%;
 
   padding: $button-small-padding;
 
@@ -19,7 +20,6 @@
 .comment-input {
   box-sizing: border-box;
 
-  width: 100%;
   min-height: 30px;
   max-height: 70px;
 

@@ -22,6 +22,8 @@
 
   &--play {
     width: 248px;
+    height: 48px;
+    border-radius: $corner-medium;
     padding: $button-large-padding;
     box-shadow: $shadow-level-1;
   }
