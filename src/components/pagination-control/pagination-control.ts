@@ -23,7 +23,10 @@ export function createPaginationControl({
 
   let activePage = currentPage;
 
-  const previousButton = createArrowButton('Previous page', chevronBackwardIcon);
+  const previousButton = createArrowButton(
+    'Previous page',
+    chevronBackwardIcon,
+  );
 
   previousButton.disabled = !isLoop && activePage === 1;
 
@@ -117,7 +120,9 @@ function createArrowButton(label: string, icon: string): HTMLButtonElement {
 }
 
 function getVisiblePages(currentPage: number, totalPages: number): number[] {
-  const maxVisiblePages = 4;
+  const maxVisiblePages = globalThis.matchMedia('(max-width: 767px)').matches
+    ? 3
+    : 4;
 
   if (totalPages <= maxVisiblePages) {
     return Array.from({ length: totalPages }, (_, index) => index + 1);

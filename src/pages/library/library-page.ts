@@ -10,7 +10,7 @@ import {
   getGameLibraryTotalPages,
 } from './sections/game-library/game-library';
 import type { SortOption } from '../../components/sort-options/sort-options';
-import {createAuthModal} from "../../components/auth-modals/auth-modals.ts";
+import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -66,7 +66,15 @@ export function renderLibraryPage(): HTMLElement {
 
   const footer = createFooter();
 
-  page.append(header, title, filters, library, paginationSection, footer, authModal.modal);
+  page.append(
+    header,
+    title,
+    filters,
+    library,
+    paginationSection,
+    footer,
+    authModal.modal,
+  );
 
   return page;
 

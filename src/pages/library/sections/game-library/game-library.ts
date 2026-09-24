@@ -42,12 +42,17 @@ export function createGameLibrary({
         });
         document.body.append(dialog);
         dialog.showModal();
+        dialog.addEventListener('click', (event: MouseEvent) => {
+          if (event.target === dialog) {
+            dialog.close();
+          }
+        });
         dialog.addEventListener(
-            'close',
-            () => {
-              dialog.remove();
-            },
-            { once: true },
+          'close',
+          () => {
+            dialog.remove();
+          },
+          { once: true },
         );
       },
     });
@@ -69,7 +74,9 @@ export function getGameLibraryTotalPages(
 }
 
 function filterGames(games: Game[], filter: string): Game[] {
-  return filter === 'all' ? games : games.filter((game) => game.category === filter);
+  return filter === 'all'
+    ? games
+    : games.filter((game) => game.category === filter);
 }
 
 function sortGames(games: Game[], sort: SortOption): Game[] {
