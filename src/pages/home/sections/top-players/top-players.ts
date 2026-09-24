@@ -66,7 +66,7 @@ function createTableBody(players: TopPlayer[]): HTMLTableSectionElement {
   for (const player of players) {
     const row = document.createElement('tr');
     const rank = document.createElement('td');
-    rank.textContent = (`#` + player.rank);
+    rank.textContent = `#` + player.rank;
 
     const playerName = document.createElement('td');
     const containerAvatar = document.createElement('div');
@@ -88,7 +88,7 @@ function createTableBody(players: TopPlayer[]): HTMLTableSectionElement {
     totalGames.append(score, scoreMobile);
 
     const streak = document.createElement('td');
-    streak.textContent = (`🔥 ` + player.streakDays + `d`);
+    streak.textContent = `🔥 ` + player.streakDays + `d`;
 
     const gamesPlayed = document.createElement('td');
     gamesPlayed.textContent = String(player.gamesPlayed);

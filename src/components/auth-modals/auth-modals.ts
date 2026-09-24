@@ -7,7 +7,7 @@ import { createTextInputField } from './text-input-field/text-input-field';
 import { createPlayOrDetailsButton } from '../play-or-details-button/play-or-details-button.ts';
 import { createTextLink } from '../text-link/text-link.ts';
 import { createDivider } from './divider/divider.ts';
-import {createGoogleButton} from "./google-button/google-button.ts";
+import { createGoogleButton } from './google-button/google-button.ts';
 
 interface AuthModal {
   modal: HTMLDialogElement;

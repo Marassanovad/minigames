@@ -43,7 +43,11 @@ function handleNavigation(event: MouseEvent): void {
 
   const link = target.closest('a');
 
-  if (!link || link.target === '_blank' || (link.origin !== globalThis.location.origin)) {
+  if (
+    !link ||
+    link.target === '_blank' ||
+    link.origin !== globalThis.location.origin
+  ) {
     return;
   }
 

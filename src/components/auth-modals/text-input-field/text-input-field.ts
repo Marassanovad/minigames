@@ -69,8 +69,8 @@ export function createTextInputField({
     const inputValue = input.value.trim();
 
     return (
-        inputValue.length > 0 &&
-        (type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputValue))
+      inputValue.length > 0 &&
+      (type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputValue))
     );
   }
 

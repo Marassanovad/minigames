@@ -5,7 +5,10 @@ import starIcon from '../../assets/icons/star.svg?raw';
 import { getGameImage } from '../../data/game-images.ts';
 import { createCloseButton } from '../close-button/close-button.ts';
 import { createPlayOrDetailsButton } from '../play-or-details-button/play-or-details-button.ts';
-import { createFavoriteButton } from '../favorite-button/favorite-button.ts';
+import {
+  createFavoriteButton,
+  type FavoriteButtonElement,
+} from '../favorite-button/favorite-button.ts';
 import { createCommentInput } from '../comment-input/comment-input.ts';
 import { createSendButton } from '../send-button/send-button.ts';
 import { createCommentLikeButton } from '../comment-like-button/comment-like-button.ts';
@@ -99,34 +102,47 @@ export function createGameDialog({
   description.className = 'game-dialog__description';
   description.textContent = game.fullDescription;
 
-  const action_buttons = document.createElement('div');
-  action_buttons.className = 'game-dialog__action-buttons';
+  const actionButtons = document.createElement('div');
+  actionButtons.className = 'game-dialog__action-buttons';
+
   const playButton = createPlayOrDetailsButton({
     variant: 'play',
     onClick: () => {
       // play action
     },
   });
+
+  let isFavorite = game.isLikedByCurrentUser;
+
+  const favoriteButtons: FavoriteButtonElement[] = [];
+
+  const toggleFavorite = (): void => {
+    isFavorite = !isFavorite;
+
+    for (const button of favoriteButtons) {
+      button.setFavorite(isFavorite);
+    }
+  };
+
   const favoriteButton = createFavoriteButton({
     variant: 'text',
-    isFavorite: false,
-    onClick: () => {
-      // favorite action
-    },
+    isFavorite,
+    onClick: toggleFavorite,
   });
+
   favoriteButton.classList.add('game-dialog__favorite-button', 'desktop-only');
 
   const favoriteButton2 = createFavoriteButton({
     variant: 'icon',
-    isFavorite: false,
-    onClick: () => {
-      // favorite action
-    },
+    isFavorite,
+    onClick: toggleFavorite,
   });
 
   favoriteButton2.classList.add('game-dialog__favorite-button', 'mobile-only');
 
-  action_buttons.append(playButton, favoriteButton, favoriteButton2);
+  favoriteButtons.push(favoriteButton, favoriteButton2);
+
+  actionButtons.append(playButton, favoriteButton, favoriteButton2);
 
   const specs = createSpecs(game.specs);
   const records = createTopRecords(game.topRecords);
@@ -134,7 +150,7 @@ export function createGameDialog({
 
   title_content.append(title, stats);
 
-  body.append(title_content, description, specs, action_buttons, records);
+  body.append(title_content, description, specs, actionButtons, records);
 
   if (comments) {
     body.append(comments);
@@ -324,7 +340,9 @@ function createComments(comments: GameComment[]): HTMLElement | undefined {
 }
 
 function formatLikes(likesCount: number): string {
-  return likesCount >= 1000 ? `${(likesCount / 1000).toFixed(1)}K` : String(likesCount);
+  return likesCount >= 1000
+    ? `${(likesCount / 1000).toFixed(1)}K`
+    : String(likesCount);
 }
 
 function formatScore(score: number): string {
