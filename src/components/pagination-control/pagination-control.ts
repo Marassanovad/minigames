@@ -23,11 +23,11 @@ export function createPaginationControl({
 
   let activePage = currentPage;
 
-  const prevButton = createArrowButton('Previous page', chevronBackwardIcon);
+  const previousButton = createArrowButton('Previous page', chevronBackwardIcon);
 
-  prevButton.disabled = !isLoop && activePage === 1;
+  previousButton.disabled = !isLoop && activePage === 1;
 
-  prevButton.addEventListener('click', () => {
+  previousButton.addEventListener('click', () => {
     if (isLoop) {
       activePage = activePage === 1 ? totalPages : activePage - 1;
 
@@ -35,18 +35,20 @@ export function createPaginationControl({
       return;
     }
 
-    if (activePage > 1) {
-      activePage -= 1;
-      onPageChange(activePage);
+    if (!(activePage > 1)) {
+      return;
     }
+
+    activePage -= 1;
+    onPageChange(activePage);
   });
 
-  controls.append(prevButton);
+  controls.append(previousButton);
 
   if (!hidePages) {
     const pages = getVisiblePages(activePage, totalPages);
 
-    pages.forEach((page) => {
+    for (const page of pages) {
       const pageButton = createPageButton(page, page === activePage);
 
       pageButton.addEventListener('click', () => {
@@ -55,7 +57,7 @@ export function createPaginationControl({
       });
 
       controls.append(pageButton);
-    });
+    }
   }
 
   const nextButton = createArrowButton('Next page', chevronForwardIcon);
@@ -70,10 +72,12 @@ export function createPaginationControl({
       return;
     }
 
-    if (activePage < totalPages) {
-      activePage += 1;
-      onPageChange(activePage);
+    if (!(activePage < totalPages)) {
+      return;
     }
+
+    activePage += 1;
+    onPageChange(activePage);
   });
 
   controls.append(nextButton);

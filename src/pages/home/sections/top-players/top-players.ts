@@ -51,22 +51,22 @@ function createTableHeader(): HTMLTableSectionElement {
     'Streak',
     'Favorite Game',
   ];
-  headers.forEach((headerText) => {
+  for (const headerText of headers) {
     const header = document.createElement('th');
     header.scope = 'col';
     header.textContent = headerText;
     row.append(header);
-  });
+  }
   thead.append(row);
   return thead;
 }
 
 function createTableBody(players: TopPlayer[]): HTMLTableSectionElement {
   const tbody = document.createElement('tbody');
-  players.forEach((player) => {
+  for (const player of players) {
     const row = document.createElement('tr');
     const rank = document.createElement('td');
-    rank.textContent = String(`#` + player.rank);
+    rank.textContent = (`#` + player.rank);
 
     const playerName = document.createElement('td');
     const containerAvatar = document.createElement('div');
@@ -88,7 +88,7 @@ function createTableBody(players: TopPlayer[]): HTMLTableSectionElement {
     totalGames.append(score, scoreMobile);
 
     const streak = document.createElement('td');
-    streak.textContent = String(`🔥 ` + player.streakDays + `d`);
+    streak.textContent = (`🔥 ` + player.streakDays + `d`);
 
     const gamesPlayed = document.createElement('td');
     gamesPlayed.textContent = String(player.gamesPlayed);
@@ -101,7 +101,7 @@ function createTableBody(players: TopPlayer[]): HTMLTableSectionElement {
 
     row.append(rank, playerName, gamesPlayed, totalGames, streak, favoriteGame);
     tbody.append(row);
-  });
+  }
   return tbody;
 }
 
@@ -109,11 +109,11 @@ function formatNumber(value: number): string {
   return value.toLocaleString('en-US');
 }
 
-function createUserAvatar(userName: string): HTMLDivElement {
+function createUserAvatar(username: string): HTMLDivElement {
   const avatar = document.createElement('div');
   avatar.className = 'top-players__avatar';
 
-  const nameParts = userName.trim().split(/\s+/);
+  const nameParts = username.trim().split(/\s+/);
 
   const initials =
     nameParts.length > 1
@@ -126,9 +126,5 @@ function createUserAvatar(userName: string): HTMLDivElement {
 }
 
 function formatCompactNumber(value: number): string {
-  if (value >= 1000) {
-    return `${Math.floor(value / 1000)}K`;
-  }
-
-  return String(value);
+  return value >= 1000 ? `${Math.floor(value / 1000)}K` : String(value);
 }

@@ -58,9 +58,5 @@ export function createGameCard({
 }
 
 function formatLikes(likesCount: number): string {
-  if (likesCount >= 1000) {
-    return `${(likesCount / 1000).toFixed(1)}K`;
-  }
-
-  return String(likesCount);
+  return likesCount >= 1000 ? `${(likesCount / 1000).toFixed(1)}K` : String(likesCount);
 }

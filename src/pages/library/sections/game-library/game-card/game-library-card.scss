@@ -66,6 +66,11 @@
 
   &__description {
     color: $color-on-bg;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
   }
 
   &__stats {
@@ -126,10 +131,7 @@
     }
 
     &__description {
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
-      overflow: hidden;
     }
     &__price {
       font-size: $font-size-headline-small;
