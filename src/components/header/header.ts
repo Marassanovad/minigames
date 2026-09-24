@@ -10,7 +10,7 @@ import {
 } from '../burger-menu-button/mobile-menu/mobile-menu.ts';
 
 interface HeaderOptions {
-  userName?: string;
+  username?: string;
   isAuthenticated?: boolean;
   onLogin?: () => void;
   onSignup?: () => void;
@@ -19,7 +19,7 @@ interface HeaderOptions {
 }
 
 export function createHeader({
-  userName = '',
+  username = '',
   isAuthenticated = false,
   onLogin = () => {},
   onSignup = () => {},
@@ -44,15 +44,15 @@ export function createHeader({
     const user = document.createElement('div');
     user.className = 'header__user';
 
-    const userNameElement = document.createElement('span');
-    userNameElement.className = 'header__user-name';
-    userNameElement.textContent = userName;
+    const usernameElement = document.createElement('span');
+    usernameElement.className = 'header__user-name';
+    usernameElement.textContent = username;
 
-    const avatar = createUserAvatar(userName);
+    const avatar = createUserAvatar(username);
 
     const logoutButton = createAuthButton('logout', onLogout);
 
-    user.append(userNameElement, avatar);
+    user.append(usernameElement, avatar);
     navActions.append(user, logoutButton);
   } else {
     const loginButton = createAuthButton('login', onLogin);
@@ -115,9 +115,9 @@ function createNavigation(): HTMLElement {
   const navigation = document.createElement('nav');
 
   navigation.className = 'header__navigation';
-  const currentPath = window.location.pathname;
+  const currentPath = globalThis.location.pathname;
 
-  navigationLinks.forEach(({ label, href }) => {
+  for (const { label, href } of navigationLinks) {
     const link = document.createElement('a');
 
     link.className = 'header__nav-link';
@@ -129,16 +129,16 @@ function createNavigation(): HTMLElement {
     }
 
     navigation.append(link);
-  });
+  }
 
   return navigation;
 }
 
-function createUserAvatar(userName: string): HTMLDivElement {
+function createUserAvatar(username: string): HTMLDivElement {
   const avatar = document.createElement('div');
   avatar.className = 'header__user-avatar';
 
-  const nameParts = userName.trim().split(/\s+/);
+  const nameParts = username.trim().split(/\s+/);
 
   const initials =
     nameParts.length > 1

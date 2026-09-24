@@ -40,7 +40,7 @@ export function createFilters({
 
   function renderChips(): void {
     chips.replaceChildren();
-    categories.forEach((category) => {
+    for (const category of categories) {
       const chip = createFilterChip({
         label: category.label,
         isActive: category.slug === activeFilter,
@@ -51,6 +51,6 @@ export function createFilters({
         },
       });
       chips.append(chip);
-    });
+    }
   }
 }

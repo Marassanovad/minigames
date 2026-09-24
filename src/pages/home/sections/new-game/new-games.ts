@@ -66,7 +66,7 @@ export function createNewGames(): HTMLElement {
 
     const visibleGames = getVisibleGames(featuredGames, currentIndex);
 
-    visibleGames.forEach((game, index) => {
+    for (const [index, game] of visibleGames.entries()) {
       const relativeIndex = index - 2;
 
       track.append(
@@ -82,7 +82,7 @@ export function createNewGames(): HTMLElement {
           },
         }),
       );
-    });
+    }
   }
 }
 

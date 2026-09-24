@@ -17,7 +17,7 @@ export function createMenuLink(
   }
 
   link.addEventListener('click', () => {
-    window.location.href = href;
+    globalThis.location.assign(href);
   });
 
   return link;

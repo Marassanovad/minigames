@@ -1,0 +1,16 @@
+@use '../../../styles/tokens' as *;
+
+.google-button {
+  height: 50px;
+  background: $color-white;
+  padding: $button-large-padding;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+
+  border-radius: $corner-medium;
+  border: 2px solid $color-on-primary;
+  font-weight: $font-weight-bold;
+}

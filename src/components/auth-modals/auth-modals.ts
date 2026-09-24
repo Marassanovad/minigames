@@ -1,5 +1,4 @@
 import './auth-modals.scss';
-import googleIcon from '../../assets/icons/goggle.svg?raw';
 import {
   createAuthTabSwitcher,
   type AuthTab,
@@ -8,6 +7,7 @@ import { createTextInputField } from './text-input-field/text-input-field';
 import { createPlayOrDetailsButton } from '../play-or-details-button/play-or-details-button.ts';
 import { createTextLink } from '../text-link/text-link.ts';
 import { createDivider } from './divider/divider.ts';
+import { createGoogleButton } from './google-button/google-button.ts';
 
 interface AuthModal {
   modal: HTMLDialogElement;
@@ -60,7 +60,7 @@ export function createAuthModal(initialTab: AuthTab = 'login'): AuthModal {
   footer.append(footerText, footerButton);
 
   function render(): void {
-    tabSwitcherContainer.innerHTML = '';
+    tabSwitcherContainer.replaceChildren();
 
     const tabSwitcher = createAuthTabSwitcher(activeTab, (tab: AuthTab) => {
       activeTab = tab;
@@ -77,7 +77,7 @@ export function createAuthModal(initialTab: AuthTab = 'login'): AuthModal {
         ? 'Sign in to resume your games and progress.'
         : 'Join MiniGames to track your score & streak.';
 
-    form.innerHTML = '';
+    form.replaceChildren();
 
     if (activeTab === 'login') {
       renderLogin();
@@ -214,25 +214,4 @@ export function createAuthModal(initialTab: AuthTab = 'login'): AuthModal {
       }
     },
   };
-
-  function createGoogleButton(onClick: () => void): HTMLButtonElement {
-    const button = document.createElement('button');
-
-    button.type = 'button';
-    button.className = 'google-button';
-
-    const icon = document.createElement('span');
-    icon.className = 'google-button__icon';
-    icon.innerHTML = googleIcon;
-
-    const text = document.createElement('span');
-    text.className = 'google-button__text';
-    text.textContent = 'Continue with Google';
-
-    button.append(icon, text);
-
-    button.addEventListener('click', onClick);
-
-    return button;
-  }
 }

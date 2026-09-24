@@ -70,7 +70,7 @@ function createFooterBottom(): HTMLElement {
 
   const school = document.createElement('a');
   school.className = 'footer__bottom-link';
-  school.href = 'https://app.rs.school';
+  school.href = 'https://rs.school/courses/short-track';
 
   const schoolIcon = document.createElement('span');
   schoolIcon.className = 'footer__icon-school';
@@ -113,10 +113,10 @@ function createExploreLinks(): HTMLElement {
   const links = document.createElement('div');
   links.className = 'footer__top-column-links';
 
-  navigationLinks.forEach(({ label, href }) => {
+  for (const { label, href } of navigationLinks) {
     const link = createFooterLink('text', label, href);
     links.append(link);
-  });
+  }
 
   column.append(title, links);
 

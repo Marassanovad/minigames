@@ -56,10 +56,7 @@ export function createTextInputField({
   input.className = 'text-input-field__input';
   input.placeholder = placeholder;
   input.value = value;
-
-  if (autocomplete) {
-    input.autocomplete = autocomplete;
-  }
+  input.autocomplete = autocomplete ?? '';
 
   const errorMessage = document.createElement('span');
   errorMessage.className = 'text-input-field__error';
@@ -68,22 +65,17 @@ export function createTextInputField({
 
   let hasBeenTouched = false;
 
-  function validate(): boolean {
+  function isInputValid(): boolean {
     const inputValue = input.value.trim();
 
-    if (!inputValue) {
-      return false;
-    }
-
-    if (type === 'email') {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputValue);
-    }
-
-    return true;
+    return (
+      inputValue.length > 0 &&
+      (type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputValue))
+    );
   }
 
   function updateValidation(): void {
-    const isValid = validate();
+    const isValid = isInputValid();
 
     wrapper.classList.toggle('is-error', hasBeenTouched && !isValid);
 

@@ -18,11 +18,11 @@ export function initRouter(): void {
   renderPage(app);
 
   document.addEventListener('click', handleNavigation);
-  window.addEventListener('popstate', () => renderPage(app));
+  globalThis.addEventListener('popstate', () => renderPage(app));
 }
 
 function renderPage(app: HTMLElement): void {
-  const pathname = window.location.pathname;
+  const pathname = globalThis.location.pathname;
 
   const path =
     pathname === BASE_PATH || pathname === `${BASE_PATH}/`
@@ -43,16 +43,16 @@ function handleNavigation(event: MouseEvent): void {
 
   const link = target.closest('a');
 
-  if (!link || link.target === '_blank') {
-    return;
-  }
-
-  if (link.origin !== window.location.origin) {
+  if (
+    !link ||
+    link.target === '_blank' ||
+    link.origin !== globalThis.location.origin
+  ) {
     return;
   }
 
   event.preventDefault();
 
-  window.history.pushState({}, '', link.pathname);
-  window.dispatchEvent(new PopStateEvent('popstate'));
+  globalThis.history.pushState({}, '', link.pathname);
+  globalThis.dispatchEvent(new PopStateEvent('popstate'));
 }

@@ -36,25 +36,25 @@ export function createMobileMenu({
   const nav = document.createElement('nav');
   nav.className = 'mobile-menu__nav';
 
-  navigationLinks.forEach(({ label, href }) => {
-    const isActive = window.location.pathname === href;
+  for (const { label, href } of navigationLinks) {
+    const isActive = globalThis.location.pathname === href;
 
     const link = createMenuLink(label, href, isActive);
     nav.append(link);
-  });
+  }
 
   const actions = document.createElement('div');
   actions.className = 'mobile-menu__actions';
 
-  if (!isAuthenticated) {
+  if (isAuthenticated) {
+    const logout = createAuthButton('logout', onLogout, 'dark');
+    actions.append(logout);
+  } else {
     const login = createAuthButton('login', onLogin, 'dark');
 
     const signup = createAuthButton('signup', onSignup, 'light');
 
     actions.append(login, signup);
-  } else {
-    const logout = createAuthButton('logout', onLogout, 'dark');
-    actions.append(logout);
   }
 
   menu.append(header, nav, actions);
