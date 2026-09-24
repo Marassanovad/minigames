@@ -9,7 +9,7 @@ interface SortOptionItem {
   label: string;
 }
 
-interface SortOptionsProps {
+interface SortOptionsProperties {
   value?: SortOption;
   onChange: (value: SortOption) => void;
 }
@@ -36,7 +36,7 @@ const SORT_OPTIONS: SortOptionItem[] = [
 export function createSortOptions({
   value = 'rating-desc',
   onChange,
-}: SortOptionsProps): HTMLDivElement {
+}: SortOptionsProperties): HTMLDivElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'sort-options';
 
@@ -66,7 +66,7 @@ export function createSortOptions({
   function renderDropdown(): void {
     dropdown.replaceChildren();
 
-    SORT_OPTIONS.forEach((option, index) => {
+    for (const [index, option] of SORT_OPTIONS.entries()) {
       const item = document.createElement('button');
 
       item.type = 'button';
@@ -102,12 +102,14 @@ export function createSortOptions({
 
       dropdown.append(item);
 
-      if (index < SORT_OPTIONS.length - 1) {
-        const divider = document.createElement('div');
-        divider.className = 'sort-options__divider';
-        dropdown.append(divider);
+      if (index === SORT_OPTIONS.length - 1) {
+        continue;
       }
-    });
+
+      const divider = document.createElement('div');
+      divider.className = 'sort-options__divider';
+      dropdown.append(divider);
+    }
   }
 
   function openDropdown(): void {

@@ -113,10 +113,10 @@ function createExploreLinks(): HTMLElement {
   const links = document.createElement('div');
   links.className = 'footer__top-column-links';
 
-  navigationLinks.forEach(({ label, href }) => {
+  for (const { label, href } of navigationLinks) {
     const link = createFooterLink('text', label, href);
     links.append(link);
-  });
+  }
 
   column.append(title, links);
 
