@@ -9,3 +9,17 @@ export interface Game {
   cardImage: string;
   featured: boolean;
 }
+
+export interface GamesResponse {
+  data: Game[];
+  meta: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+    appliedFilter: {
+      category: string;
+      sort: string;
+    };
+  };
+}

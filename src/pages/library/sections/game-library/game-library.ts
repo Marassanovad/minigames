@@ -2,7 +2,7 @@ import './game-library.scss';
 
 import gamesData from '../../../../data/all-games-seed.json';
 import type { SortOption } from '../../../../components/sort-options/sort-options';
-import type { Game } from '../../../../types/game';
+import type { Game } from '../../../../types/game.ts';
 import { createGameCard } from './game-card/game-library-card.ts';
 import { createGameDialog } from '../../../../components/game-dialog/game-dialog.ts';
 import gameDetailsData from '../../../../data/game-tukoni-forest-keepers.json';

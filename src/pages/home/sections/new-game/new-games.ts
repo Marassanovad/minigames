@@ -1,8 +1,8 @@
-import gamesData from '../../../../data/all-games-seed.json';
+import { getGames } from '../../../../api/game-api';
 import { createGameCard } from '../../../../components/game-card/game-card';
 import type { GameCardPosition } from '../../../../components/game-card/game-card';
 import { createPaginationControl } from '../../../../components/pagination-control/pagination-control';
-import type { Game } from '../../../../types/game';
+import type { Game, GamesResponse } from '../../../../types/game.ts';
 import './new-games.scss';
 
 const VISIBLE_CARDS = 5;
@@ -33,33 +33,112 @@ export function createNewGames(): HTMLElement {
 
   title.append(bar, text);
 
-  const featuredGames = gamesData.data.filter(
-    (game) => game.featured,
-  ) as Game[];
-
-  let currentIndex = 0;
-
-  const pagination = createPaginationControl({
-    currentPage: currentIndex + 1,
-    totalPages: featuredGames.length,
-    onPageChange: (page) => {
-      currentIndex = page - 1;
-      renderCards();
-    },
-    hidePages: true,
-    isLoop: true,
-  });
-
-  header.append(title, pagination);
-
   const track = document.createElement('div');
   track.className = 'new-games__track';
 
-  renderCards();
+  const paginationContainer = document.createElement('div');
 
+  header.append(title, paginationContainer);
   section.append(header, track);
 
+  let featuredGames: Game[] = [];
+  let currentIndex = 0;
+
+  renderLoading();
+
+  loadFeaturedGames();
+
   return section;
+
+  async function loadFeaturedGames(): Promise<void> {
+    try {
+      const response: GamesResponse = await getGames({
+        featured: true,
+      });
+
+      featuredGames = response.data.map((game) => ({
+        ...game,
+        featured: true,
+      }));
+
+      if (featuredGames.length === 0) {
+        renderEmpty();
+        return;
+      }
+
+      currentIndex = 0;
+
+      renderPagination();
+      renderCards();
+    } catch {
+      renderError();
+    }
+  }
+
+  function renderLoading(): void {
+    paginationContainer.replaceChildren();
+    track.replaceChildren();
+
+    for (let index = 0; index < VISIBLE_CARDS; index += 1) {
+      const skeleton = document.createElement('div');
+
+      skeleton.className = 'new-games__skeleton';
+
+      track.append(skeleton);
+    }
+  }
+
+  function renderError(): void {
+    paginationContainer.replaceChildren();
+    track.replaceChildren();
+
+    const error = document.createElement('div');
+    error.className = 'new-games__error';
+
+    const message = document.createElement('p');
+    message.textContent = 'Failed to load games. Please try again.';
+
+    const retryButton = document.createElement('button');
+    retryButton.type = 'button';
+    retryButton.textContent = 'Retry';
+
+    retryButton.addEventListener('click', () => {
+      renderLoading();
+      loadFeaturedGames();
+    });
+
+    error.append(message, retryButton);
+    track.append(error);
+  }
+
+  function renderEmpty(): void {
+    paginationContainer.replaceChildren();
+    track.replaceChildren();
+
+    const empty = document.createElement('div');
+    empty.className = 'new-games__empty';
+
+    empty.textContent = 'No featured games found.';
+
+    track.append(empty);
+  }
+
+  function renderPagination(): void {
+    paginationContainer.replaceChildren();
+
+    const pagination = createPaginationControl({
+      currentPage: currentIndex + 1,
+      totalPages: featuredGames.length,
+      onPageChange: (page) => {
+        currentIndex = page - 1;
+        renderCards();
+      },
+      hidePages: true,
+      isLoop: true,
+    });
+
+    paginationContainer.append(pagination);
+  }
 
   function renderCards(): void {
     track.replaceChildren();

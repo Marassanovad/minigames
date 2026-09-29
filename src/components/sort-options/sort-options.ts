@@ -1,8 +1,6 @@
 import choseIcon from '../../assets/icons/chose.svg?raw';
 import './sort-options.scss';
-
-export type SortOption =
-  'rating-asc' | 'rating-desc' | 'name-asc' | 'name-desc';
+import type { SortOption } from '../../types/sort';
 
 interface SortOptionItem {
   value: SortOption;
