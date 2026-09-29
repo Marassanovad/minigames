@@ -171,6 +171,69 @@
   &__score-mobile {
     display: none;
   }
+
+  &__loading {
+    width: 100%;
+    min-height: 260px;
+    padding: $spacing-3;
+
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2;
+  }
+
+  &__skeleton-row {
+    height: 48px;
+
+    border-radius: $corner-small;
+
+    background: linear-gradient(
+      90deg,
+      $color-background 25%,
+      $color-white 50%,
+      $color-background 75%
+    );
+    background-size: 200% 100%;
+
+    animation: top-players-skeleton 1.5s infinite;
+  }
+
+  &__empty,
+  &__error {
+    min-height: 260px;
+    padding: $spacing-3;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-2;
+
+    text-align: center;
+  }
+
+  &__error p {
+    margin: 0;
+  }
+
+  &__error button {
+    padding: $spacing-1 $spacing-3;
+
+    border: 0;
+    border-radius: $corner-small;
+
+    cursor: pointer;
+  }
+}
+
+@keyframes top-players-skeleton {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -188,6 +251,7 @@
 
     th {
       padding: $spacing-2;
+
       font-size: $font-size-body-small;
       white-space: nowrap;
       overflow: hidden;
@@ -214,12 +278,13 @@
           display: none;
         }
       }
+    }
 
-      td {
-        height: 48px;
-        padding: $spacing-2;
-        font-size: $font-size-body-small;
-      }
+    td {
+      height: 48px;
+      padding: $spacing-2;
+
+      font-size: $font-size-body-small;
     }
 
     td:last-child {
@@ -267,16 +332,16 @@
           display: none;
         }
       }
+    }
 
-      td {
-        height: 48px;
-        padding: $spacing-2;
-        font-size: $font-size-body-small;
+    td {
+      height: 48px;
+      padding: $spacing-2;
+      font-size: $font-size-body-small;
 
-        &:nth-child(3),
-        &:last-child {
-          display: none;
-        }
+      &:nth-child(3),
+      &:last-child {
+        display: none;
       }
     }
 

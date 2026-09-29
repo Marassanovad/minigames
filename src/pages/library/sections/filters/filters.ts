@@ -1,8 +1,8 @@
 import './filters.scss';
 import { createFilterChip } from '../../../../components/filter-chip/filter-chip';
 import { createSortOptions } from '../../../../components/sort-options/sort-options';
-import type { SortOption } from '../../../../components/sort-options/sort-options';
 import categoriesData from '../../../../data/categories.json';
+import type { SortOption } from '../../../../types/sort.ts';
 
 interface GameCategory {
   slug: string;
