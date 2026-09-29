@@ -1,15 +1,9 @@
-import leaderboardData from '../../../../data/leaderboard.json';
+import type { LeaderboardPlayer } from '../../../../types/leaderboard';
 import './top-players.scss';
-
-interface TopPlayer {
-  rank: number;
-  playerName: string;
-  gamesPlayed: number;
-  totalScore: number;
-  streakDays: number;
-  favoriteGameSlug: string;
-  favoriteGameName: string;
-}
+import { getLeaderboard } from '../../../../api/catalog-api.ts';
+import { formatCompactNumber } from '../../../../utils/compact-number.ts';
+import { formatNumber } from '../../../../utils/format-number.ts';
+import { createUserAvatar } from '../../../../utils/create-avatar.ts';
 
 export function createTopPlayers(): HTMLElement {
   const section = document.createElement('section');
@@ -28,21 +22,85 @@ export function createTopPlayers(): HTMLElement {
 
   const tableWrapper = document.createElement('div');
   tableWrapper.className = 'top-players__table-wrapper';
-  const table = document.createElement('table');
-  table.className = 'top-players__table';
-  table.append(
-    createTableHeader(),
-    createTableBody(leaderboardData.data as TopPlayer[]),
-  );
-  tableWrapper.append(table);
+
   section.append(title, tableWrapper);
 
+  loadLeaderboard();
+
   return section;
+
+  async function loadLeaderboard(): Promise<void> {
+    showLoading();
+
+    try {
+      const response = await getLeaderboard();
+
+      if (response.data.length === 0) {
+        showEmpty();
+        return;
+      }
+
+      const table = document.createElement('table');
+      table.className = 'top-players__table';
+
+      table.append(createTableHeader(), createTableBody(response.data));
+
+      tableWrapper.replaceChildren(table);
+    } catch {
+      showError();
+    }
+  }
+
+  function showLoading(): void {
+    tableWrapper.replaceChildren();
+
+    const loading = document.createElement('div');
+    loading.className = 'top-players__loading';
+
+    for (let index = 0; index < 5; index += 1) {
+      const row = document.createElement('div');
+      row.className = 'top-players__skeleton-row';
+      loading.append(row);
+    }
+
+    tableWrapper.append(loading);
+  }
+
+  function showEmpty(): void {
+    tableWrapper.replaceChildren();
+
+    const empty = document.createElement('div');
+    empty.className = 'top-players__empty';
+    empty.textContent = 'No players found.';
+
+    tableWrapper.append(empty);
+  }
+
+  function showError(): void {
+    tableWrapper.replaceChildren();
+
+    const error = document.createElement('div');
+    error.className = 'top-players__error';
+
+    const message = document.createElement('p');
+    message.textContent = 'Failed to load leaderboard.';
+
+    const retryButton = document.createElement('button');
+    retryButton.type = 'button';
+    retryButton.textContent = 'Retry';
+    retryButton.addEventListener('click', () => {
+      void loadLeaderboard();
+    });
+
+    error.append(message, retryButton);
+    tableWrapper.append(error);
+  }
 }
 
 function createTableHeader(): HTMLTableSectionElement {
   const thead = document.createElement('thead');
   const row = document.createElement('tr');
+
   const headers = [
     'Rank',
     'Player',
@@ -51,80 +109,75 @@ function createTableHeader(): HTMLTableSectionElement {
     'Streak',
     'Favorite Game',
   ];
+
   for (const headerText of headers) {
     const header = document.createElement('th');
     header.scope = 'col';
     header.textContent = headerText;
     row.append(header);
   }
+
   thead.append(row);
+
   return thead;
 }
 
-function createTableBody(players: TopPlayer[]): HTMLTableSectionElement {
+function createTableBody(
+  players: LeaderboardPlayer[],
+): HTMLTableSectionElement {
   const tbody = document.createElement('tbody');
+
   for (const player of players) {
     const row = document.createElement('tr');
+
     const rank = document.createElement('td');
-    rank.textContent = `#` + player.rank;
+    rank.textContent = `#${player.rank}`;
 
     const playerName = document.createElement('td');
+
     const containerAvatar = document.createElement('div');
     containerAvatar.className = 'top-players__container-avatar';
+
     const avatar = createUserAvatar(player.playerName);
+    avatar.className = 'top-players__avatar';
+
     const name = document.createElement('span');
     name.className = 'top-players__player-name';
     name.textContent = player.playerName;
+
     containerAvatar.append(avatar, name);
     playerName.append(containerAvatar);
-
-    const totalGames = document.createElement('td');
-    const score = document.createElement('span');
-    score.className = 'top-players__score';
-    score.textContent = formatNumber(player.totalScore);
-    const scoreMobile = document.createElement('span');
-    scoreMobile.className = 'top-players__score-mobile';
-    scoreMobile.textContent = formatCompactNumber(player.totalScore);
-    totalGames.append(score, scoreMobile);
-
-    const streak = document.createElement('td');
-    streak.textContent = `🔥 ` + player.streakDays + `d`;
 
     const gamesPlayed = document.createElement('td');
     gamesPlayed.textContent = String(player.gamesPlayed);
 
+    const scoreCell = document.createElement('td');
+
+    const score = document.createElement('span');
+    score.className = 'top-players__score';
+    score.textContent = formatNumber(player.totalScore);
+
+    const scoreMobile = document.createElement('span');
+    scoreMobile.className = 'top-players__score-mobile';
+    scoreMobile.textContent = formatCompactNumber(player.totalScore);
+
+    scoreCell.append(score, scoreMobile);
+
+    const streak = document.createElement('td');
+    streak.textContent = `🔥 ${player.streakDays}d`;
+
     const favoriteGame = document.createElement('td');
+
     const containerFavorite = document.createElement('div');
     containerFavorite.className = 'top-players__favorite';
     containerFavorite.textContent = player.favoriteGameName;
+
     favoriteGame.append(containerFavorite);
 
-    row.append(rank, playerName, gamesPlayed, totalGames, streak, favoriteGame);
+    row.append(rank, playerName, gamesPlayed, scoreCell, streak, favoriteGame);
+
     tbody.append(row);
   }
+
   return tbody;
-}
-
-function formatNumber(value: number): string {
-  return value.toLocaleString('en-US');
-}
-
-function createUserAvatar(username: string): HTMLDivElement {
-  const avatar = document.createElement('div');
-  avatar.className = 'top-players__avatar';
-
-  const nameParts = username.trim().split(/\s+/);
-
-  const initials =
-    nameParts.length > 1
-      ? `${nameParts[0][0]}${nameParts[1][0]}`
-      : (nameParts[0]?.[0] ?? '');
-
-  avatar.textContent = initials.toUpperCase();
-
-  return avatar;
-}
-
-function formatCompactNumber(value: number): string {
-  return value >= 1000 ? `${Math.floor(value / 1000)}K` : String(value);
 }

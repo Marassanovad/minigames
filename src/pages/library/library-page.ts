@@ -9,8 +9,8 @@ import {
   createGameLibrary,
   getGameLibraryTotalPages,
 } from './sections/game-library/game-library';
-import type { SortOption } from '../../components/sort-options/sort-options';
 import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
+import type { SortOption } from '../../types/sort.ts';
 
 const ITEMS_PER_PAGE = 6;
 

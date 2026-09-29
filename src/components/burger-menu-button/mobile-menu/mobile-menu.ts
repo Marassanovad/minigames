@@ -1,10 +1,10 @@
 import './mobile-menu.scss';
 
 import { navigationLinks } from '../../../data/navigation-links';
-import logoIcon from '../../../assets/icons/logo.svg';
 import { createBurgerCloseButton } from '../burger-close-button.ts';
 import { createMenuLink } from '../../menu-link/menu-link.ts';
 import { createAuthButton } from '../../auth-button/auth-button.ts';
+import { createLogo } from '../../../utils/create-logo.ts';
 
 interface MobileMenuOptions {
   isAuthenticated: boolean;
@@ -26,6 +26,7 @@ export function createMobileMenu({
   header.className = 'mobile-menu__header';
 
   const logo = createLogo();
+  logo.className = 'mobile-menu__logo';
 
   const closeButton = createBurgerCloseButton(() => {
     closeMenu(menu);
@@ -70,22 +71,4 @@ export function openMenu(menu: HTMLElement): void {
 export function closeMenu(menu: HTMLElement): void {
   menu.classList.remove('mobile-menu--open');
   document.body.classList.remove('menu-open');
-}
-
-function createLogo(): HTMLAnchorElement {
-  const logo = document.createElement('a');
-
-  logo.className = 'mobile-menu__logo';
-  logo.href = '/';
-
-  const icon = document.createElement('img');
-  icon.src = logoIcon;
-  icon.alt = '';
-
-  const text = document.createElement('span');
-  text.textContent = 'MiniGames';
-
-  logo.append(icon, text);
-
-  return logo;
 }
