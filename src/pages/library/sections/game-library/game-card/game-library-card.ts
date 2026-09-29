@@ -1,6 +1,6 @@
 import './game-library-card.scss';
 
-import type { Game } from '../../../../../types/game';
+import type { Game } from '../../../../../types/game.ts';
 import { getGameImage } from '../../../../../data/game-images';
 import { createPlayOrDetailsButton } from '../../../../../components/play-or-details-button/play-or-details-button';
 import starIcon from '../../../../../assets/icons/star.svg?raw';
