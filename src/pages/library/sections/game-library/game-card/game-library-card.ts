@@ -5,6 +5,7 @@ import { getGameImage } from '../../../../../data/game-images';
 import { createPlayOrDetailsButton } from '../../../../../components/play-or-details-button/play-or-details-button';
 import starIcon from '../../../../../assets/icons/star.svg?raw';
 import likeIcon from '../../../../../assets/icons/like.svg?raw';
+import { formatCompactNumber } from '../../../../../utils/compact-number.ts';
 
 interface GameCardOptions {
   game: Game;
@@ -63,7 +64,7 @@ export function createGameCard({
   const likes = document.createElement('span');
   likes.className = 'library_game-card__likes';
   likes.innerHTML = likeIcon;
-  likes.insertAdjacentText('beforeend', formatLikes(game.likesCount));
+  likes.insertAdjacentText('beforeend', formatCompactNumber(game.likesCount));
 
   const priceStats = document.createElement('p');
   priceStats.className =
@@ -88,10 +89,4 @@ export function createGameCard({
   card.append(image, content);
 
   return card;
-}
-
-function formatLikes(likesCount: number): string {
-  return likesCount >= 1000
-    ? `${(likesCount / 1000).toFixed(1)}K`
-    : String(likesCount);
 }

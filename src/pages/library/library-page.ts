@@ -5,10 +5,7 @@ import { createHeader } from '../../components/header/header';
 import { createPaginationControl } from '../../components/pagination-control/pagination-control';
 import { createPageTitle } from './sections/page-title/page-title';
 import { createFilters } from './sections/filters/filters';
-import {
-  createGameLibrary,
-  getGameLibraryTotalPages,
-} from './sections/game-library/game-library';
+import { createGameLibrary } from './sections/game-library/game-library';
 import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
 import type { SortOption } from '../../types/sort.ts';
 
@@ -35,12 +32,17 @@ export function renderLibraryPage(): HTMLElement {
   let activeFilter = 'all';
   let activeSort: SortOption = 'rating-desc';
   let currentPage = 1;
+  let totalPages = 1;
 
   let library = createGameLibrary({
     filter: activeFilter,
     sort: activeSort,
     page: currentPage,
     itemsPerPage: ITEMS_PER_PAGE,
+    onTotalPagesChange: (pages) => {
+      totalPages = pages;
+      updatePagination();
+    },
   });
 
   const paginationSection = document.createElement('section');
@@ -84,11 +86,20 @@ export function renderLibraryPage(): HTMLElement {
       sort: activeSort,
       page: currentPage,
       itemsPerPage: ITEMS_PER_PAGE,
+      onTotalPagesChange: (pages) => {
+        totalPages = pages;
+        updatePagination();
+      },
     });
 
     library.replaceWith(newLibrary);
     library = newLibrary;
 
+    totalPages = 1;
+    updatePagination();
+  }
+
+  function updatePagination(): void {
     const newPagination = createPagination();
 
     pagination.replaceWith(newPagination);
@@ -96,8 +107,6 @@ export function renderLibraryPage(): HTMLElement {
   }
 
   function createPagination(): HTMLDivElement {
-    const totalPages = getGameLibraryTotalPages(activeFilter, ITEMS_PER_PAGE);
-
     const control = createPaginationControl({
       currentPage,
       totalPages,
