@@ -1,17 +1,18 @@
 import './game-library.scss';
-import gamesData from '../../../../data/all-games-seed.json';
+import { getGames } from '../../../../api/game-api';
 import type { Game } from '../../../../types/game.ts';
+import type { SortOption } from '../../../../types/sort.ts';
 import { createGameCard } from './game-card/game-library-card.ts';
 import { createGameDialog } from '../../../../components/game-dialog/game-dialog.ts';
 import gameDetailsData from '../../../../data/game-tukoni-forest-keepers.json';
 import commentsData from '../../../../data/comments-tukoni-forest-keepers.json';
-import type { SortOption } from '../../../../types/sort.ts';
 
 interface GameLibraryOptions {
   filter: string;
   sort: SortOption;
   page?: number;
   itemsPerPage?: number;
+  onTotalPagesChange?: (totalPages: number) => void;
 }
 
 export function createGameLibrary({
@@ -19,87 +20,120 @@ export function createGameLibrary({
   sort,
   page = 1,
   itemsPerPage = 6,
+  onTotalPagesChange,
 }: GameLibraryOptions): HTMLElement {
   const section = document.createElement('section');
   section.className = 'game-library';
 
-  const games = gamesData.data as Game[];
-
-  const filteredGames = filterGames(games, filter);
-  const sortedGames = sortGames(filteredGames, sort);
-
-  const startIndex = (page - 1) * itemsPerPage;
-  const pageGames = sortedGames.slice(startIndex, startIndex + itemsPerPage);
-
-  for (const game of pageGames) {
-    const card = createGameCard({
-      game,
-      onDetail: () => {
-        const gameDetails = gameDetailsData.data;
-        const dialog = createGameDialog({
-          game: { ...gameDetails, comments: commentsData.data },
-        });
-        document.body.append(dialog);
-        dialog.showModal();
-        dialog.addEventListener('click', (event: MouseEvent) => {
-          if (event.target === dialog) {
-            dialog.close();
-          }
-        });
-        dialog.addEventListener(
-          'close',
-          () => {
-            dialog.remove();
-          },
-          { once: true },
-        );
-      },
-    });
-
-    section.append(card);
-  }
+  loadGames();
 
   return section;
-}
 
-export function getGameLibraryTotalPages(
-  filter: string,
-  itemsPerPage = 6,
-): number {
-  const games = gamesData.data as Game[];
-  const filteredGames = filterGames(games, filter);
+  async function loadGames(): Promise<void> {
+    showLoading();
 
-  return Math.ceil(filteredGames.length / itemsPerPage);
-}
+    try {
+      const response = await getGames({
+        page,
+        limit: itemsPerPage,
+        category: filter === 'all' ? undefined : filter,
+        sort,
+      });
 
-function filterGames(games: Game[], filter: string): Game[] {
-  return filter === 'all'
-    ? games
-    : games.filter((game) => game.category === filter);
-}
+      onTotalPagesChange?.(response.meta.totalPages);
 
-function sortGames(games: Game[], sort: SortOption): Game[] {
-  return games.toSorted((firstGame, secondGame) => {
-    switch (sort) {
-      case 'rating-asc': {
-        return firstGame.rating - secondGame.rating;
+      if (response.data.length === 0) {
+        showEmpty();
+        return;
       }
 
-      case 'rating-desc': {
-        return secondGame.rating - firstGame.rating;
-      }
+      const games = response.data.map((game): Game => ({
+        ...game,
+        featured: false,
+      }));
 
-      case 'name-asc': {
-        return firstGame.name.localeCompare(secondGame.name);
-      }
-
-      case 'name-desc': {
-        return secondGame.name.localeCompare(firstGame.name);
-      }
-
-      default: {
-        return 0;
-      }
+      renderGames(games);
+    } catch {
+      showError();
     }
-  });
+  }
+
+  function renderGames(games: Game[]): void {
+    section.replaceChildren();
+
+    for (const game of games) {
+      const card = createGameCard({
+        game,
+        onDetail: () => {
+          const gameDetails = gameDetailsData.data;
+
+          const dialog = createGameDialog({
+            game: {
+              ...gameDetails,
+              comments: commentsData.data,
+            },
+          });
+
+          document.body.append(dialog);
+          dialog.showModal();
+
+          dialog.addEventListener('click', (event: MouseEvent) => {
+            if (event.target === dialog) {
+              dialog.close();
+            }
+          });
+
+          dialog.addEventListener(
+            'close',
+            () => {
+              dialog.remove();
+            },
+            { once: true },
+          );
+        },
+      });
+
+      section.append(card);
+    }
+  }
+
+  function showLoading(): void {
+    section.replaceChildren();
+
+    for (let index = 0; index < 6; index += 1) {
+      const skeleton = document.createElement('div');
+      skeleton.className = 'game-library__skeleton';
+      section.append(skeleton);
+    }
+  }
+
+  function showEmpty(): void {
+    section.replaceChildren();
+
+    const empty = document.createElement('div');
+    empty.className = 'game-library__empty';
+    empty.textContent = 'No games found.';
+
+    section.append(empty);
+  }
+
+  function showError(): void {
+    section.replaceChildren();
+
+    const error = document.createElement('div');
+    error.className = 'game-library__error';
+
+    const message = document.createElement('p');
+    message.textContent = 'Failed to load games.';
+
+    const retryButton = document.createElement('button');
+    retryButton.type = 'button';
+    retryButton.textContent = 'Retry';
+    retryButton.addEventListener('click', () => {
+      void loadGames();
+    });
+
+    error.append(message, retryButton);
+    section.append(error);
+  }
 }
