@@ -3,9 +3,7 @@ import { getGames } from '../../../../api/game-api';
 import type { Game } from '../../../../types/game.ts';
 import type { SortOption } from '../../../../types/sort.ts';
 import { createGameCard } from './game-card/game-library-card.ts';
-import { createGameDialog } from '../../../../components/game-dialog/game-dialog.ts';
-import gameDetailsData from '../../../../data/game-tukoni-forest-keepers.json';
-import commentsData from '../../../../data/comments-tukoni-forest-keepers.json';
+import { navigate } from '../../../../app/router.ts';
 
 interface GameLibraryOptions {
   filter: string;
@@ -65,31 +63,13 @@ export function createGameLibrary({
       const card = createGameCard({
         game,
         onDetail: () => {
-          const gameDetails = gameDetailsData.data;
-
-          const dialog = createGameDialog({
-            game: {
-              ...gameDetails,
-              comments: commentsData.data,
-            },
+          navigate({
+            path: '/library',
+            category: filter === 'all' ? undefined : filter,
+            sort,
+            page,
+            game: game.slug,
           });
-
-          document.body.append(dialog);
-          dialog.showModal();
-
-          dialog.addEventListener('click', (event: MouseEvent) => {
-            if (event.target === dialog) {
-              dialog.close();
-            }
-          });
-
-          dialog.addEventListener(
-            'close',
-            () => {
-              dialog.remove();
-            },
-            { once: true },
-          );
         },
       });
 
@@ -129,6 +109,7 @@ export function createGameLibrary({
     const retryButton = document.createElement('button');
     retryButton.type = 'button';
     retryButton.textContent = 'Retry';
+
     retryButton.addEventListener('click', () => {
       void loadGames();
     });

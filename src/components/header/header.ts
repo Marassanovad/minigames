@@ -98,23 +98,19 @@ export function createHeader({
 
 function createNavigation(): HTMLElement {
   const navigation = document.createElement('nav');
-
   navigation.className = 'header__navigation';
   const currentPath = globalThis.location.pathname;
-
   for (const { label, href } of navigationLinks) {
     const link = document.createElement('a');
-
     link.className = 'header__nav-link';
     link.href = href;
     link.textContent = label;
-
-    if (currentPath === href) {
+    const homePaths = ['/minigames', '/minigames/', '/minigames/home'];
+    const isHome = href === '/minigames/' && homePaths.includes(currentPath);
+    if (currentPath === href || isHome) {
       link.classList.add('is-active');
     }
-
     navigation.append(link);
   }
-
   return navigation;
 }
