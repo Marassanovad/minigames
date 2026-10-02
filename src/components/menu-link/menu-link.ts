@@ -7,7 +7,7 @@ export function createMenuLink(
 ): HTMLAnchorElement {
   const link = document.createElement('a');
 
-  link.className = `menu-link`;
+  link.className = 'menu-link';
   link.href = href;
 
   link.textContent = content;
@@ -15,10 +15,6 @@ export function createMenuLink(
   if (isActive) {
     link.classList.add('is-active');
   }
-
-  link.addEventListener('click', () => {
-    globalThis.location.assign(href);
-  });
 
   return link;
 }

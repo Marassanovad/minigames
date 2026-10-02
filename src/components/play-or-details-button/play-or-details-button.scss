@@ -20,7 +20,8 @@
     background: $color-primary-high;
   }
 
-  &--play {
+  &--play,
+  &--purchase {
     width: 248px;
     height: 48px;
     border-radius: $corner-medium;

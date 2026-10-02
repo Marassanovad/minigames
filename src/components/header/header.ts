@@ -1,13 +1,14 @@
 import { createAuthButton } from '../auth-button/auth-button';
 import { createBurgerMenuButton } from '../burger-menu-button/burger-menu-button';
 import './header.scss';
-import logoIcon from '../../assets/icons/logo.svg';
 import { navigationLinks } from '../../data/navigation-links.ts';
 import {
   closeMenu,
   createMobileMenu,
   openMenu,
 } from '../burger-menu-button/mobile-menu/mobile-menu.ts';
+import { createUserAvatar } from '../../utils/create-avatar.ts';
+import { createLogo } from '../../utils/create-logo.ts';
 
 interface HeaderOptions {
   username?: string;
@@ -30,6 +31,7 @@ export function createHeader({
   header.className = 'header';
 
   const logo = createLogo();
+  logo.className = 'header__logo';
 
   const navActions = document.createElement('div');
   navActions.className = 'header__nav-actions';
@@ -49,6 +51,7 @@ export function createHeader({
     usernameElement.textContent = username;
 
     const avatar = createUserAvatar(username);
+    avatar.className = 'header__user-avatar';
 
     const logoutButton = createAuthButton('logout', onLogout);
 
@@ -93,59 +96,21 @@ export function createHeader({
   return header;
 }
 
-function createLogo(): HTMLAnchorElement {
-  const logo = document.createElement('a');
-
-  logo.className = 'header__logo';
-  logo.href = '/';
-
-  const icon = document.createElement('img');
-  icon.src = logoIcon;
-  icon.alt = '';
-
-  const text = document.createElement('span');
-  text.textContent = 'MiniGames';
-
-  logo.append(icon, text);
-
-  return logo;
-}
-
 function createNavigation(): HTMLElement {
   const navigation = document.createElement('nav');
-
   navigation.className = 'header__navigation';
   const currentPath = globalThis.location.pathname;
-
   for (const { label, href } of navigationLinks) {
     const link = document.createElement('a');
-
     link.className = 'header__nav-link';
     link.href = href;
     link.textContent = label;
-
-    if (currentPath === href) {
+    const homePaths = ['/minigames', '/minigames/', '/minigames/home'];
+    const isHome = href === '/minigames/' && homePaths.includes(currentPath);
+    if (currentPath === href || isHome) {
       link.classList.add('is-active');
     }
-
     navigation.append(link);
   }
-
   return navigation;
-}
-
-function createUserAvatar(username: string): HTMLDivElement {
-  const avatar = document.createElement('div');
-  avatar.className = 'header__user-avatar';
-
-  const nameParts = username.trim().split(/\s+/);
-
-  const initials =
-    nameParts.length > 1
-      ? `${nameParts[0][0]}${nameParts[1][0]}`
-      : (nameParts[0]?.[0] ?? '');
-
-  avatar.textContent = initials.toUpperCase();
-
-  return avatar;
 }

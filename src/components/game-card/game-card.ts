@@ -1,4 +1,4 @@
-import type { Game } from '../../types/game';
+import type { Game } from '../../types/game.ts';
 import './game-card.scss';
 import { getGameImage } from '../../data/game-images.ts';
 import starIcon from '../../assets/icons/star.svg?raw';

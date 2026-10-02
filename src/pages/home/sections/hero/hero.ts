@@ -1,5 +1,6 @@
 import './hero.scss';
 import { createPlayOrDetailsButton } from '../../../../components/play-or-details-button/play-or-details-button.ts';
+import { navigate } from '../../../../app/router.ts';
 
 export function createHero(): HTMLElement {
   const section = document.createElement('section');
@@ -24,7 +25,11 @@ export function createHero(): HTMLElement {
   const button = createPlayOrDetailsButton({
     variant: 'details',
     title: 'Browse Library',
-    onClick: () => {},
+    onClick: () => {
+      navigate({
+        path: '/library',
+      });
+    },
   });
 
   content.append(title, description, button);

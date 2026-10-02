@@ -7,6 +7,58 @@
   gap: $spacing-3;
 
   width: 100%;
+  &__skeleton {
+    min-height: 280px;
+
+    border-radius: $corner-large;
+
+    background: linear-gradient(
+      90deg,
+      $color-background 25%,
+      $color-white 50%,
+      $color-background 75%
+    );
+    background-size: 200% 100%;
+
+    animation: game-library-skeleton 1.5s infinite;
+  }
+
+  &__empty,
+  &__error {
+    width: 100%;
+    min-height: 280px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-2;
+
+    text-align: center;
+  }
+
+  &__error p {
+    margin: 0;
+  }
+
+  &__error button {
+    padding: $spacing-1 $spacing-3;
+
+    border: 0;
+    border-radius: $corner-small;
+
+    cursor: pointer;
+  }
+}
+
+@keyframes game-library-skeleton {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
