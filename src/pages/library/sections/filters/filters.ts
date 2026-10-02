@@ -6,11 +6,15 @@ import type { SortOption } from '../../../../types/sort.ts';
 import { getCategories } from '../../../../api/catalog-api.ts';
 
 interface FiltersOptions {
+  activeFilter?: string;
+  activeSort?: SortOption;
   onFilterChange?: (filter: string) => void;
   onSortChange?: (sort: SortOption) => void;
 }
 
 export function createFilters({
+  activeFilter = 'all',
+  activeSort = 'rating-desc',
   onFilterChange,
   onSortChange,
 }: FiltersOptions = {}): HTMLElement {
@@ -21,7 +25,7 @@ export function createFilters({
   chips.className = 'filters__chips';
 
   const dropdown = createSortOptions({
-    value: 'rating-desc',
+    value: activeSort,
     onChange: (sort) => {
       onSortChange?.(sort);
     },
@@ -43,13 +47,14 @@ export function createFilters({
         showEmpty();
         return;
       }
-
       const defaultCategory =
         response.data.find((category) => category.isDefault) ??
         response.data[0];
 
-      renderChips(response.data, defaultCategory.slug);
-      onFilterChange?.(defaultCategory.slug);
+      const selectedFilter =
+        activeFilter === 'all' ? defaultCategory.slug : activeFilter;
+
+      renderChips(response.data, selectedFilter);
     } catch {
       showError();
     }

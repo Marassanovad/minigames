@@ -1,6 +1,6 @@
 import { get, post } from './api';
 import type { SortOption } from '../types/sort';
-import type { GamesResponse } from '../types/game.ts';
+import type { GameDetailsResponse, GamesResponse } from '../types/game.ts';
 
 export interface GetGamesParameters {
   featured?: boolean;
@@ -48,7 +48,10 @@ export function getGames(
   return get<GamesResponse>(`/games${query ? `?${query}` : ''}`);
 }
 
-export function getGame(gameSlug: string, parameters?: GetGameParameters) {
+export function getGame(
+  gameSlug: string,
+  parameters?: GetGameParameters,
+): Promise<GameDetailsResponse> {
   const searchParameters = new URLSearchParams();
 
   if (parameters?.userEmail) {
@@ -57,7 +60,9 @@ export function getGame(gameSlug: string, parameters?: GetGameParameters) {
 
   const query = searchParameters.toString();
 
-  return get(`/games/${gameSlug}${query ? `?${query}` : ''}`);
+  return get<GameDetailsResponse>(
+    `/games/${gameSlug}${query ? `?${query}` : ''}`,
+  );
 }
 
 export function toggleFavorite(gameSlug: string, body: ToggleFavoriteRequest) {

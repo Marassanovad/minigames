@@ -7,7 +7,11 @@ import { createPageTitle } from './sections/page-title/page-title';
 import { createFilters } from './sections/filters/filters';
 import { createGameLibrary } from './sections/game-library/game-library';
 import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
+import { createGameDialog } from '../../components/game-dialog/game-dialog.ts';
+
 import type { SortOption } from '../../types/sort.ts';
+
+import { getRouteState, navigate } from '../../app/router.ts';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -15,30 +19,73 @@ export function renderLibraryPage(): HTMLElement {
   const page = document.createElement('main');
   page.className = 'library-page';
 
-  const authModal = createAuthModal();
+  const route = getRouteState();
+
+  let activeFilter = route.category ?? 'all';
+
+  let activeSort: SortOption =
+    (route.sort as SortOption | undefined) ?? 'rating-desc';
+
+  let currentPage = route.page ?? 1;
+
+  let totalPages = 1;
+
+  const authModal = createAuthModal(
+    'login',
+    () => {
+      navigate({
+        path: '/library',
+        category: activeFilter === 'all' ? undefined : activeFilter,
+        sort: activeSort,
+        page: currentPage,
+        auth: undefined,
+        game: route.game,
+      });
+    },
+    (tab) => {
+      navigate({
+        path: '/library',
+        category: activeFilter === 'all' ? undefined : activeFilter,
+        sort: activeSort,
+        page: currentPage,
+        auth: tab,
+        game: route.game,
+      });
+    },
+  );
 
   const header = createHeader({
     onLogin: () => {
-      authModal.open('login');
+      navigate({
+        path: '/library',
+        category: activeFilter === 'all' ? undefined : activeFilter,
+        sort: activeSort,
+        page: currentPage,
+        auth: 'login',
+        game: route.game,
+      });
     },
 
     onSignup: () => {
-      authModal.open('register');
+      navigate({
+        path: '/library',
+        category: activeFilter === 'all' ? undefined : activeFilter,
+        sort: activeSort,
+        page: currentPage,
+        auth: 'register',
+        game: route.game,
+      });
     },
   });
 
   const title = createPageTitle();
 
-  let activeFilter = 'all';
-  let activeSort: SortOption = 'rating-desc';
-  let currentPage = 1;
-  let totalPages = 1;
-
-  let library = createGameLibrary({
+  const library = createGameLibrary({
     filter: activeFilter,
     sort: activeSort,
     page: currentPage,
     itemsPerPage: ITEMS_PER_PAGE,
+
     onTotalPagesChange: (pages) => {
       totalPages = pages;
       updatePagination();
@@ -51,22 +98,52 @@ export function renderLibraryPage(): HTMLElement {
   let pagination = createPagination();
 
   const filters = createFilters({
+    activeFilter,
+    activeSort,
+
     onFilterChange: (filter) => {
       activeFilter = filter;
       currentPage = 1;
 
-      updateLibrary();
+      navigate({
+        path: '/library',
+        category: filter === 'all' ? undefined : filter,
+        sort: activeSort,
+        page: currentPage,
+      });
     },
 
     onSortChange: (sort) => {
       activeSort = sort;
       currentPage = 1;
 
-      updateLibrary();
+      navigate({
+        path: '/library',
+        category: activeFilter === 'all' ? undefined : activeFilter,
+        sort,
+        page: currentPage,
+      });
     },
   });
 
   const footer = createFooter();
+
+  const gameDialog = route.game
+    ? createGameDialog({
+        gameSlug: route.game,
+
+        onClose: () => {
+          navigate({
+            path: '/library',
+            category: activeFilter === 'all' ? undefined : activeFilter,
+            sort: activeSort,
+            page: currentPage,
+            game: undefined,
+            auth: undefined,
+          });
+        },
+      })
+    : undefined;
 
   page.append(
     header,
@@ -78,26 +155,23 @@ export function renderLibraryPage(): HTMLElement {
     authModal.modal,
   );
 
-  return page;
+  if (gameDialog) {
+    page.append(gameDialog);
 
-  function updateLibrary(): void {
-    const newLibrary = createGameLibrary({
-      filter: activeFilter,
-      sort: activeSort,
-      page: currentPage,
-      itemsPerPage: ITEMS_PER_PAGE,
-      onTotalPagesChange: (pages) => {
-        totalPages = pages;
-        updatePagination();
-      },
+    queueMicrotask(() => {
+      if (!gameDialog.open) {
+        gameDialog.showModal();
+      }
     });
-
-    library.replaceWith(newLibrary);
-    library = newLibrary;
-
-    totalPages = 1;
-    updatePagination();
   }
+
+  if (route.auth) {
+    queueMicrotask(() => {
+      authModal.open(route.auth!);
+    });
+  }
+
+  return page;
 
   function updatePagination(): void {
     const newPagination = createPagination();
@@ -110,9 +184,16 @@ export function renderLibraryPage(): HTMLElement {
     const control = createPaginationControl({
       currentPage,
       totalPages,
+
       onPageChange: (page) => {
         currentPage = page;
-        updateLibrary();
+
+        navigate({
+          path: '/library',
+          category: activeFilter === 'all' ? undefined : activeFilter,
+          sort: activeSort,
+          page: currentPage,
+        });
       },
     });
 
