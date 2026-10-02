@@ -41,6 +41,11 @@ export function createMobileMenu({
     const isActive = globalThis.location.pathname === href;
 
     const link = createMenuLink(label, href, isActive);
+
+    link.addEventListener('click', () => {
+      closeMenu(menu);
+    });
+
     nav.append(link);
   }
 
