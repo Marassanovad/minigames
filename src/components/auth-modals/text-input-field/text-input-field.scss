@@ -19,10 +19,11 @@
   color: $color-on-primary;
 
   &__label {
-    font-weight: $font-weight-bold;
+    margin-right: auto;
+
     color: $color-on-primary;
     font-size: $font-size-body-small;
-    margin-right: auto;
+    font-weight: $font-weight-bold;
   }
 
   &__icon {
@@ -51,9 +52,9 @@
     height: 100%;
     padding: 0;
 
-    background: transparent;
     border: none;
     outline: none;
+    background: transparent;
 
     color: $color-on-primary;
     font-family: $font-family-inter;
@@ -66,6 +67,38 @@
     }
   }
 
+  &__password-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 100%;
+    flex-shrink: 0;
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    color: inherit;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    &:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: -2px;
+      border-radius: 4px;
+    }
+  }
+
+  &__eye {
+    display: block;
+    pointer-events: none;
+  }
+
   &.is-empty {
     .text-input-field__icon {
       color: $color-on-bg;
@@ -73,7 +106,6 @@
   }
 
   &:focus-within {
-    color: $color-on-primary;
     background: $color-surface-low;
     border-color: $color-on-primary;
 
@@ -90,6 +122,7 @@
     }
   }
 }
+
 .text-input-field-container {
   display: flex;
   flex-direction: column;

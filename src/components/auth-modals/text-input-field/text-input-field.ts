@@ -1,6 +1,7 @@
 import mailIcon from '../../../assets/icons/mail.svg?raw';
 import userIcon from '../../../assets/icons/person.svg?raw';
 import passwordIcon from '../../../assets/icons/lock.svg?raw';
+import eyeIcon from '../../../assets/icons/eye.svg?raw';
 import './text-input-field.scss';
 
 type TextInputType = 'text' | 'email' | 'password';
@@ -12,8 +13,14 @@ interface TextInputFieldOptions {
   value?: string;
   placeholder?: string;
   autocomplete?: HTMLInputElement['autocomplete'];
+  errorMessage?: string;
+  validate?: (value: string) => boolean;
   onChange?: (value: string) => void;
   onValidChange?: (isValid: boolean) => void;
+}
+
+export interface TextInputFieldElement extends HTMLDivElement {
+  validate: () => boolean;
 }
 
 const icons: Record<TextInputType, string> = {
@@ -22,6 +29,30 @@ const icons: Record<TextInputType, string> = {
   password: passwordIcon,
 };
 
+function createPasswordToggle(input: HTMLInputElement): HTMLButtonElement {
+  const button = document.createElement('button');
+
+  button.type = 'button';
+  button.className = 'text-input-field__password-toggle';
+  button.setAttribute('aria-label', 'Show password');
+  button.innerHTML = eyeIcon;
+
+  button.addEventListener('click', () => {
+    const isPasswordVisible = input.type === 'text';
+
+    input.type = isPasswordVisible ? 'password' : 'text';
+
+    button.setAttribute(
+      'aria-label',
+      isPasswordVisible ? 'Show password' : 'Hide password',
+    );
+
+    button.setAttribute('aria-pressed', String(!isPasswordVisible));
+  });
+
+  return button;
+}
+
 export function createTextInputField({
   label = '',
   type = 'text',
@@ -29,10 +60,13 @@ export function createTextInputField({
   value = '',
   placeholder = '',
   autocomplete,
+  errorMessage = 'Please enter a valid data',
+  validate,
   onChange,
   onValidChange,
-}: TextInputFieldOptions = {}): HTMLDivElement {
-  const container = document.createElement('div');
+}: TextInputFieldOptions = {}): TextInputFieldElement {
+  const container = document.createElement('div') as TextInputFieldElement;
+
   container.className = 'text-input-field-container';
 
   if (label) {
@@ -58,33 +92,42 @@ export function createTextInputField({
   input.value = value;
   input.autocomplete = autocomplete ?? '';
 
-  const errorMessage = document.createElement('span');
-  errorMessage.className = 'text-input-field__error';
-  errorMessage.textContent = 'Please enter a valid data';
-  errorMessage.hidden = true;
+  const errorMessageElement = document.createElement('span');
+  errorMessageElement.className = 'text-input-field__error';
+  errorMessageElement.textContent = errorMessage;
+  errorMessageElement.hidden = true;
 
   let hasBeenTouched = false;
 
   function isInputValid(): boolean {
     const inputValue = input.value.trim();
+    const validationResult = validate?.(inputValue);
 
     return (
-      inputValue.length > 0 &&
-      (type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputValue))
+      validationResult ??
+      (inputValue.length > 0 &&
+        (type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputValue)))
     );
   }
 
-  function updateValidation(): void {
+  function isValidationSuccessful(): boolean {
     const isValid = isInputValid();
 
     wrapper.classList.toggle('is-error', hasBeenTouched && !isValid);
 
     wrapper.classList.toggle('is-valid', hasBeenTouched && isValid);
 
-    errorMessage.hidden = type !== 'email' || !hasBeenTouched || isValid;
+    errorMessageElement.hidden = !hasBeenTouched || isValid;
 
     onValidChange?.(isValid);
+
+    return isValid;
   }
+
+  container.validate = () => {
+    hasBeenTouched = true;
+    return isValidationSuccessful();
+  };
 
   wrapper.classList.toggle('is-empty', input.value === '');
 
@@ -94,17 +137,29 @@ export function createTextInputField({
     onChange?.(input.value);
 
     if (hasBeenTouched) {
-      updateValidation();
+      isValidationSuccessful();
     }
+  });
+
+  input.addEventListener('change', () => {
+    isValidationSuccessful();
   });
 
   input.addEventListener('blur', () => {
     hasBeenTouched = true;
-    updateValidation();
+    isValidationSuccessful();
   });
 
+  const passwordToggle =
+    type === 'password' ? createPasswordToggle(input) : undefined;
+
   wrapper.append(iconElement, input);
-  container.append(wrapper, errorMessage);
+
+  if (passwordToggle) {
+    wrapper.append(passwordToggle);
+  }
+
+  container.append(wrapper, errorMessageElement);
 
   return container;
 }

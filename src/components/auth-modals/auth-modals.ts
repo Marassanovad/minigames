@@ -14,6 +14,33 @@ interface AuthModal {
   open: (tab: AuthTab) => void;
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const USERNAME_REGEX = /^[A-Z][A-Za-z0-9]{1,29}$/;
+const PASSWORD_SPECIAL_CHARACTER_REGEX = /[^A-Za-z0-9]/;
+const PASSWORD_UPPERCASE_REGEX = /[A-Z]/;
+const PASSWORD_DIGIT_REGEX = /\d/;
+
+function isValidEmail(value: string): boolean {
+  return value.length > 0 && EMAIL_REGEX.test(value);
+}
+
+function isValidUsername(value: string): boolean {
+  return USERNAME_REGEX.test(value);
+}
+
+function isValidRegisterPassword(value: string): boolean {
+  return (
+    value.length >= 6 &&
+    PASSWORD_UPPERCASE_REGEX.test(value) &&
+    PASSWORD_DIGIT_REGEX.test(value) &&
+    PASSWORD_SPECIAL_CHARACTER_REGEX.test(value)
+  );
+}
+
+function isValidLoginPassword(value: string): boolean {
+  return value.length >= 6;
+}
+
 export function createAuthModal(
   initialTab: AuthTab = 'login',
   onClose?: () => void,
@@ -36,13 +63,13 @@ export function createAuthModal(
   content.className = 'auth-modal__content';
   const tabSwitcherContainer = document.createElement('div');
   tabSwitcherContainer.className = 'auth-modal__tabs';
-  const header_container = document.createElement('div');
-  header_container.className = 'auth-modal__header';
+  const headerContainer = document.createElement('div');
+  headerContainer.className = 'auth-modal__header';
   const title = document.createElement('h2');
   title.className = 'auth-modal__title';
   const description = document.createElement('p');
   description.className = 'auth-modal__description';
-  header_container.append(title, description);
+  headerContainer.append(title, description);
   const form = document.createElement('form');
   form.className = 'auth-modal__form';
   const footer = document.createElement('div');
@@ -75,12 +102,20 @@ export function createAuthModal(
   }
 
   function renderLogin(): void {
+    let isEmailValid = false;
+    let isPasswordValid = false;
     const emailField = createTextInputField({
       label: 'Email',
       type: 'email',
       icon: 'email',
       placeholder: 'e.g. alex@minigames.com',
       autocomplete: 'email',
+      errorMessage: 'Please enter a valid email address',
+      validate: isValidEmail,
+      onValidChange: (isValid) => {
+        isEmailValid = isValid;
+        updateSubmitButton();
+      },
     });
     const passwordField = createTextInputField({
       label: 'Password',
@@ -88,6 +123,12 @@ export function createAuthModal(
       icon: 'password',
       placeholder: 'Enter your password',
       autocomplete: 'current-password',
+      errorMessage: 'Password must be at least 6 characters long',
+      validate: isValidLoginPassword,
+      onValidChange: (isValid) => {
+        isPasswordValid = isValid;
+        updateSubmitButton();
+      },
     });
     const forgotPassword = createTextLink('', '');
     forgotPassword.textContent = 'Forgot password?';
@@ -98,6 +139,12 @@ export function createAuthModal(
     });
     const divider = createDivider();
     const googleButton = createGoogleButton(() => {});
+
+    function updateSubmitButton(): void {
+      loginButton.disabled = !(isEmailValid && isPasswordValid);
+    }
+
+    loginButton.disabled = true;
     form.append(
       emailField,
       passwordField,
@@ -111,12 +158,25 @@ export function createAuthModal(
   }
 
   function renderRegister(): void {
+    let isUsernameValid = false;
+    let isEmailValid = false;
+    let isPasswordValid = false;
+    let isConfirmPasswordValid = false;
+    let passwordValue = '';
+    let confirmPasswordValue = '';
     const usernameField = createTextInputField({
       label: 'Username',
       type: 'text',
       icon: 'text',
       placeholder: 'Enter your username',
       autocomplete: 'username',
+      errorMessage:
+        'Username must be 2–30 characters, start with an uppercase English letter, and contain only English letters and digits',
+      validate: isValidUsername,
+      onValidChange: (isValid) => {
+        isUsernameValid = isValid;
+        updateSubmitButton();
+      },
     });
     const emailField = createTextInputField({
       label: 'Email',
@@ -124,13 +184,12 @@ export function createAuthModal(
       icon: 'email',
       placeholder: 'e.g. alex@minigames.com',
       autocomplete: 'email',
-    });
-    const passwordField = createTextInputField({
-      label: 'Password',
-      type: 'password',
-      icon: 'password',
-      placeholder: 'Enter your password',
-      autocomplete: 'new-password',
+      errorMessage: 'Please enter a valid email address',
+      validate: isValidEmail,
+      onValidChange: (isValid) => {
+        isEmailValid = isValid;
+        updateSubmitButton();
+      },
     });
     const confirmPasswordField = createTextInputField({
       label: 'Confirm Password',
@@ -138,6 +197,37 @@ export function createAuthModal(
       icon: 'password',
       placeholder: 'Confirm your password',
       autocomplete: 'new-password',
+      errorMessage: 'Passwords do not match',
+      validate: (value) => value.length > 0 && value === passwordValue,
+      onChange: (value) => {
+        confirmPasswordValue = value;
+        updateSubmitButton();
+      },
+      onValidChange: (isValid) => {
+        isConfirmPasswordValid = isValid;
+        updateSubmitButton();
+      },
+    });
+    const passwordField = createTextInputField({
+      label: 'Password',
+      type: 'password',
+      icon: 'password',
+      placeholder: 'Enter your password',
+      autocomplete: 'new-password',
+      errorMessage:
+        'Password must be at least 6 characters and contain an uppercase English letter, a digit, and a special character',
+      validate: isValidRegisterPassword,
+      onChange: (value) => {
+        passwordValue = value;
+        if (confirmPasswordValue.length > 0) {
+          confirmPasswordField.validate();
+        }
+        updateSubmitButton();
+      },
+      onValidChange: (isValid) => {
+        isPasswordValid = isValid;
+        updateSubmitButton();
+      },
     });
     const registerButton = createPlayOrDetailsButton({
       variant: 'play',
@@ -146,6 +236,17 @@ export function createAuthModal(
     });
     const divider = createDivider();
     const googleButton = createGoogleButton(() => {});
+
+    function updateSubmitButton(): void {
+      registerButton.disabled = !(
+        isUsernameValid &&
+        isEmailValid &&
+        isPasswordValid &&
+        isConfirmPasswordValid
+      );
+    }
+
+    registerButton.disabled = true;
     form.append(
       usernameField,
       emailField,
@@ -161,11 +262,10 @@ export function createAuthModal(
 
   footerButton.addEventListener('click', () => {
     activeTab = activeTab === 'login' ? 'register' : 'login';
-
     onTabChange?.(activeTab);
     render();
   });
-  content.append(tabSwitcherContainer, header_container, form, footer);
+  content.append(tabSwitcherContainer, headerContainer, form, footer);
   container.append(content);
   modal.append(container);
   render();
