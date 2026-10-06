@@ -10,27 +10,28 @@ import type { Comment } from '../../types/comments.ts';
 import { getGameImage } from '../../data/game-images.ts';
 import { createCloseButton } from '../close-button/close-button.ts';
 import { createPlayOrDetailsButton } from '../play-or-details-button/play-or-details-button.ts';
-import {
-  createFavoriteButton,
-  type FavoriteButtonElement,
-} from '../favorite-button/favorite-button.ts';
+import { createFavoriteButton } from '../favorite-button/favorite-button.ts';
 import { formatNumber } from '../../utils/format-number.ts';
 import { formatCompactNumber } from '../../utils/compact-number.ts';
 import { getTimeAgo } from '../../utils/time-ago.ts';
 import { getMedal } from '../../utils/get-medal.ts';
 import { createCommentLikeButton } from '../comment-like-button/comment-like-button.ts';
 import { getComments } from '../../api/comments-api.ts';
-import { getGame } from '../../api/game-api.ts';
+import { getGame, toggleFavorite } from '../../api/game-api.ts';
 import { createSendButton } from '../send-button/send-button.ts';
 import { createCommentInput } from '../comment-input/comment-input.ts';
+import { auth } from '../../firebase';
+import { createSnackbar } from '../snackbar/snackbar.ts';
 
 interface GameDialogOptions {
   gameSlug: string;
+  onLogin: () => void;
   onClose?: () => void;
 }
 
 export function createGameDialog({
   gameSlug,
+  onLogin,
   onClose,
 }: GameDialogOptions): HTMLDialogElement {
   const dialog = document.createElement('dialog');
@@ -50,7 +51,12 @@ export function createGameDialog({
   async function loadGameDetails(): Promise<void> {
     showLoading();
     try {
-      const response = await getGame(gameSlug);
+      const userEmail = auth.currentUser?.email;
+
+      const response = await getGame(gameSlug, {
+        userEmail: userEmail ?? undefined,
+      });
+
       renderGame(response.data);
       void loadComments();
     } catch {
@@ -67,10 +73,14 @@ export function createGameDialog({
     }
     showCommentsLoading(commentsContainer);
     try {
+      const userEmail = auth.currentUser?.email;
+
       const response = await getComments(gameSlug, {
         limit: 3,
         sort: 'newest',
+        userEmail: userEmail ?? undefined,
       });
+
       const title = content.querySelector('.game-dialog__comments-title');
       if (title instanceof HTMLElement) {
         title.textContent = `Comments (${response.meta.totalComments})`;
@@ -131,36 +141,56 @@ export function createGameDialog({
         // play / purchase action
       },
     });
-    let isFavorite = game.isLikedByCurrentUser;
-    const favoriteButtons: FavoriteButtonElement[] = [];
-    const toggleFavorite = (): void => {
-      isFavorite = !isFavorite;
-      for (const button of favoriteButtons) {
-        button.setFavorite(isFavorite);
-      }
-    };
+
+    let isFavoriteRequestPending = false;
+
     const favoriteButton = createFavoriteButton({
-      variant: 'text',
-      isFavorite,
-      onClick: toggleFavorite,
-    });
-    favoriteButton.classList.add(
-      'game-dialog__favorite-button',
-      'desktop-only',
-    );
+      isFavorite: game.isLikedByCurrentUser,
+      onClick: async () => {
+        if (isFavoriteRequestPending) {
+          return;
+        }
 
-    const favoriteButton2 = createFavoriteButton({
-      variant: 'icon',
-      isFavorite,
-      onClick: toggleFavorite,
-    });
-    favoriteButton2.classList.add(
-      'game-dialog__favorite-button',
-      'mobile-only',
-    );
+        const user = auth.currentUser;
 
-    favoriteButtons.push(favoriteButton, favoriteButton2);
-    actionButtons.append(playButton, favoriteButton, favoriteButton2);
+        if (!user?.email) {
+          createSnackbar('Please log in to add games to favorites.', dialog);
+          onLogin();
+          return;
+        }
+
+        isFavoriteRequestPending = true;
+        favoriteButton.setLoading(true);
+
+        try {
+          const response = await toggleFavorite(game.slug, {
+            userEmail: user.email,
+          });
+
+          favoriteButton.setFavorite(response.data.isFavorited);
+
+          likes.replaceChildren();
+          likes.innerHTML = likeIcon;
+          likes.insertAdjacentText(
+            'beforeend',
+            formatCompactNumber(response.data.likesCount),
+          );
+        } catch (error) {
+          console.error('Failed to toggle favorite:', error);
+          createSnackbar(
+            'Failed to update favorites. Please try again.',
+            dialog,
+          );
+        } finally {
+          isFavoriteRequestPending = false;
+          favoriteButton.setLoading(false);
+        }
+      },
+    });
+
+    favoriteButton.classList.add('game-dialog__favorite-button');
+
+    actionButtons.append(playButton, favoriteButton);
 
     const specs = createSpecs(game.specs);
     const records = createTopRecords(game.topRecords);
