@@ -1,5 +1,11 @@
 import './auth-modals.scss';
 import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from 'firebase/auth';
+import { auth } from '../../firebase';
+import {
   createAuthTabSwitcher,
   type AuthTab,
 } from './auth-tab-switcher/auth-tab-switcher';
@@ -48,15 +54,22 @@ export function createAuthModal(
 ): AuthModal {
   const modal = document.createElement('dialog');
   modal.className = 'auth-modal';
+  let activeTab = initialTab;
+  let isAuthPending = false;
   modal.addEventListener('click', (event) => {
-    if (event.target === modal) {
+    if (!isAuthPending && event.target === modal) {
       modal.close();
+    }
+  });
+  modal.addEventListener('cancel', (event) => {
+    if (isAuthPending) {
+      event.preventDefault();
     }
   });
   modal.addEventListener('close', () => {
     onClose?.();
   });
-  let activeTab = initialTab;
+
   const container = document.createElement('div');
   container.className = 'auth-modal__container';
   const content = document.createElement('div');
@@ -70,35 +83,37 @@ export function createAuthModal(
   const description = document.createElement('p');
   description.className = 'auth-modal__description';
   headerContainer.append(title, description);
-  const form = document.createElement('form');
+  const form = document.createElement('div');
   form.className = 'auth-modal__form';
+  const authError = document.createElement('p');
+  authError.className = 'auth-modal__error';
+  authError.hidden = true;
   const footer = document.createElement('div');
   footer.className = 'auth-modal__footer';
   const footerText = document.createElement('span');
   footerText.className = 'auth-modal__footer-text';
-  const footerButton = createTextLink('', '');
+  const footerButton = document.createElement('button');
+  footerButton.type = 'button';
+  footerButton.className = 'auth-modal__footer-button';
   footer.append(footerText, footerButton);
 
-  function render(): void {
-    tabSwitcherContainer.replaceChildren();
-    const tabSwitcher = createAuthTabSwitcher(activeTab, (tab: AuthTab) => {
-      activeTab = tab;
-      onTabChange?.(tab);
-      render();
-    });
-    tabSwitcherContainer.append(tabSwitcher);
-    title.textContent =
-      activeTab === 'login' ? 'Welcome Back!' : 'Create Account';
-    description.textContent =
-      activeTab === 'login'
-        ? 'Sign in to resume your games and progress.'
-        : 'Join MiniGames to track your score & streak.';
-    form.replaceChildren();
-    if (activeTab === 'login') {
-      renderLogin();
-    } else {
-      renderRegister();
+  function setAuthPending(isPending: boolean): void {
+    isAuthPending = isPending;
+    for (const element of modal.querySelectorAll<
+      HTMLInputElement | HTMLButtonElement
+    >('input, button')) {
+      element.disabled = isPending;
     }
+  }
+
+  function showAuthError(message: string): void {
+    authError.textContent = message;
+    authError.hidden = false;
+  }
+
+  function hideAuthError(): void {
+    authError.textContent = '';
+    authError.hidden = true;
   }
 
   function renderLogin(): void {
@@ -135,13 +150,37 @@ export function createAuthModal(
     const loginButton = createPlayOrDetailsButton({
       variant: 'play',
       title: 'Login',
-      onClick: () => {},
+      onClick: async () => {
+        const email =
+          emailField.querySelector<HTMLInputElement>('input')?.value.trim() ??
+          '';
+        const password =
+          passwordField.querySelector<HTMLInputElement>('input')?.value ?? '';
+
+        hideAuthError();
+
+        try {
+          setAuthPending(true);
+          loginButton.textContent = 'Loading...';
+          await signInWithEmailAndPassword(auth, email, password);
+          setAuthPending(false);
+          modal.close();
+        } catch (error) {
+          console.error('Login failed:', error);
+          setAuthPending(false);
+          loginButton.textContent = 'Login';
+          updateSubmitButton();
+
+          showAuthError('Invalid email or password. Please try again.');
+        }
+      },
     });
     const divider = createDivider();
     const googleButton = createGoogleButton(() => {});
 
     function updateSubmitButton(): void {
-      loginButton.disabled = !(isEmailValid && isPasswordValid);
+      loginButton.disabled =
+        isAuthPending || !(isEmailValid && isPasswordValid);
     }
 
     loginButton.disabled = true;
@@ -232,18 +271,52 @@ export function createAuthModal(
     const registerButton = createPlayOrDetailsButton({
       variant: 'play',
       title: 'Create Account',
-      onClick: () => {},
+      onClick: async () => {
+        const username =
+          usernameField
+            .querySelector<HTMLInputElement>('input')
+            ?.value.trim() ?? '';
+        const email =
+          emailField.querySelector<HTMLInputElement>('input')?.value.trim() ??
+          '';
+        const password =
+          passwordField.querySelector<HTMLInputElement>('input')?.value ?? '';
+
+        hideAuthError();
+
+        try {
+          setAuthPending(true);
+          registerButton.textContent = 'Loading...';
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password,
+          );
+          await updateProfile(userCredential.user, { displayName: username });
+          setAuthPending(false);
+          modal.close();
+        } catch (error) {
+          console.error('Registration failed:', error);
+          setAuthPending(false);
+          registerButton.textContent = 'Create Account';
+          updateSubmitButton();
+
+          showAuthError(getAuthErrorMessage(error));
+        }
+      },
     });
     const divider = createDivider();
     const googleButton = createGoogleButton(() => {});
 
     function updateSubmitButton(): void {
-      registerButton.disabled = !(
-        isUsernameValid &&
-        isEmailValid &&
-        isPasswordValid &&
-        isConfirmPasswordValid
-      );
+      registerButton.disabled =
+        isAuthPending ||
+        !(
+          isUsernameValid &&
+          isEmailValid &&
+          isPasswordValid &&
+          isConfirmPasswordValid
+        );
     }
 
     registerButton.disabled = true;
@@ -260,12 +333,46 @@ export function createAuthModal(
     footerButton.textContent = 'Log In';
   }
 
+  function render(): void {
+    tabSwitcherContainer.replaceChildren();
+    const tabSwitcher = createAuthTabSwitcher(activeTab, (tab: AuthTab) => {
+      if (isAuthPending) {
+        return;
+      }
+      activeTab = tab;
+      onTabChange?.(tab);
+      render();
+    });
+    tabSwitcherContainer.append(tabSwitcher);
+    title.textContent =
+      activeTab === 'login' ? 'Welcome Back!' : 'Create Account';
+    description.textContent =
+      activeTab === 'login'
+        ? 'Sign in to resume your games and progress.'
+        : 'Join MiniGames to track your score & streak.';
+    form.replaceChildren();
+    if (activeTab === 'login') {
+      renderLogin();
+    } else {
+      renderRegister();
+    }
+  }
+
   footerButton.addEventListener('click', () => {
+    if (isAuthPending) {
+      return;
+    }
     activeTab = activeTab === 'login' ? 'register' : 'login';
     onTabChange?.(activeTab);
     render();
   });
-  content.append(tabSwitcherContainer, headerContainer, form, footer);
+  content.append(
+    tabSwitcherContainer,
+    headerContainer,
+    form,
+    authError,
+    footer,
+  );
   container.append(content);
   modal.append(container);
   render();
@@ -273,10 +380,18 @@ export function createAuthModal(
     modal,
     open: (tab: AuthTab) => {
       activeTab = tab;
+      setAuthPending(false);
       render();
       if (!modal.open) {
         modal.showModal();
       }
     },
   };
+}
+
+function getAuthErrorMessage(error: unknown): string {
+  return error instanceof Error &&
+    error.message.includes('auth/email-already-in-use')
+    ? 'This email is already registered. Please log in instead.'
+    : 'Something went wrong. Please try again.';
 }

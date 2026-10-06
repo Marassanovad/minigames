@@ -1,6 +1,8 @@
 import { renderHomePage } from '../pages/home/home-page';
 import { renderLibraryPage } from '../pages/library/library-page';
 import { renderNotFoundPage } from '../pages/not-found/not-found.ts';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
 
 const BASE_PATH = '/minigames';
 
@@ -27,6 +29,10 @@ export function initRouter(): void {
   }
 
   renderPage(app);
+
+  onAuthStateChanged(auth, () => {
+    renderPage(app);
+  });
 
   document.addEventListener('click', handleNavigation);
 

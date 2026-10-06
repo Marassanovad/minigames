@@ -136,9 +136,7 @@ export function createTextInputField({
 
     onChange?.(input.value);
 
-    if (hasBeenTouched) {
-      isValidationSuccessful();
-    }
+    isValidationSuccessful();
   });
 
   input.addEventListener('change', () => {

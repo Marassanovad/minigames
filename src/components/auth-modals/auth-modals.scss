@@ -67,5 +67,19 @@
     align-items: center;
     gap: $spacing-05;
     color: $color-on-bg;
+
+    &-button {
+      background: transparent;
+    }
+  }
+
+  &__error {
+    display: flex;
+    justify-content: center;
+    color: $color-error;
+
+    font-family: $font-family-inter;
+    font-size: $font-size-label-medium;
+    font-weight: $font-weight-regular;
   }
 }
