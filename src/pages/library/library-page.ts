@@ -8,6 +8,8 @@ import { createFilters } from './sections/filters/filters';
 import { createGameLibrary } from './sections/game-library/game-library';
 import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
 import { createGameDialog } from '../../components/game-dialog/game-dialog.ts';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase';
 
 import type { SortOption } from '../../types/sort.ts';
 
@@ -75,6 +77,9 @@ export function renderLibraryPage(): HTMLElement {
         auth: 'register',
         game: route.game,
       });
+    },
+    onLogout: async () => {
+      await signOut(auth);
     },
   });
 

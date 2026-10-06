@@ -20,6 +20,11 @@
     background: $color-primary-high;
   }
 
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
   &--play,
   &--purchase {
     width: 248px;

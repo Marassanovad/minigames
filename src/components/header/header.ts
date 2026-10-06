@@ -9,10 +9,9 @@ import {
 } from '../burger-menu-button/mobile-menu/mobile-menu.ts';
 import { createUserAvatar } from '../../utils/create-avatar.ts';
 import { createLogo } from '../../utils/create-logo.ts';
+import { auth } from '../../firebase';
 
 interface HeaderOptions {
-  username?: string;
-  isAuthenticated?: boolean;
   onLogin?: () => void;
   onSignup?: () => void;
   onLogout?: () => void;
@@ -20,13 +19,15 @@ interface HeaderOptions {
 }
 
 export function createHeader({
-  username = '',
-  isAuthenticated = false,
   onLogin = () => {},
   onSignup = () => {},
   onLogout = () => {},
   onMenuClick = () => {},
 }: HeaderOptions = {}): HTMLElement {
+  const currentUser = auth.currentUser;
+  const isAuthenticated = currentUser !== null;
+  const currentUsername = currentUser?.displayName || '';
+
   const header = document.createElement('header');
   header.className = 'header';
 
@@ -48,9 +49,9 @@ export function createHeader({
 
     const usernameElement = document.createElement('span');
     usernameElement.className = 'header__user-name';
-    usernameElement.textContent = username;
+    usernameElement.textContent = currentUsername;
 
-    const avatar = createUserAvatar(username);
+    const avatar = createUserAvatar(currentUsername);
     avatar.className = 'header__user-avatar';
 
     const logoutButton = createAuthButton('logout', onLogout);

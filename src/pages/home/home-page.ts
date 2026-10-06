@@ -6,6 +6,8 @@ import { createDeveloper } from './sections/developer/developer.ts';
 import { createTopPlayers } from './sections/top-players/top-players.ts';
 import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
 import { getRouteState, navigate } from '../../app/router.ts';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase';
 
 export function renderHomePage(): HTMLElement {
   const page = document.createElement('main');
@@ -26,6 +28,9 @@ export function renderHomePage(): HTMLElement {
     },
     onSignup: () => {
       navigate({ path: '/', auth: 'register' });
+    },
+    onLogout: async () => {
+      await signOut(auth);
     },
   });
   const hero = createHero();
