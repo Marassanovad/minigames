@@ -1,10 +1,12 @@
 import './auth-modals.scss';
+import { auth } from '../../firebase';
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   signInWithEmailAndPassword,
+  signInWithPopup,
   updateProfile,
 } from 'firebase/auth';
-import { auth } from '../../firebase';
 import {
   createAuthTabSwitcher,
   type AuthTab,
@@ -21,7 +23,7 @@ interface AuthModal {
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const USERNAME_REGEX = /^[A-Z][A-Za-z0-9]{1,29}$/;
+const USERNAME_REGEX = /^[A-Z][A-Za-z0-9]*(?: [A-Za-z0-9]+)?$/;
 const PASSWORD_SPECIAL_CHARACTER_REGEX = /[^A-Za-z0-9]/;
 const PASSWORD_UPPERCASE_REGEX = /[A-Z]/;
 const PASSWORD_DIGIT_REGEX = /\d/;
@@ -54,51 +56,70 @@ export function createAuthModal(
 ): AuthModal {
   const modal = document.createElement('dialog');
   modal.className = 'auth-modal';
+
   let activeTab = initialTab;
   let isAuthPending = false;
+
   modal.addEventListener('click', (event) => {
     if (!isAuthPending && event.target === modal) {
       modal.close();
     }
   });
+
   modal.addEventListener('cancel', (event) => {
     if (isAuthPending) {
       event.preventDefault();
     }
   });
+
   modal.addEventListener('close', () => {
     onClose?.();
   });
 
   const container = document.createElement('div');
   container.className = 'auth-modal__container';
+
   const content = document.createElement('div');
   content.className = 'auth-modal__content';
+
   const tabSwitcherContainer = document.createElement('div');
   tabSwitcherContainer.className = 'auth-modal__tabs';
+
   const headerContainer = document.createElement('div');
   headerContainer.className = 'auth-modal__header';
+
   const title = document.createElement('h2');
   title.className = 'auth-modal__title';
+
   const description = document.createElement('p');
   description.className = 'auth-modal__description';
+
   headerContainer.append(title, description);
+
   const form = document.createElement('div');
   form.className = 'auth-modal__form';
+
   const authError = document.createElement('p');
   authError.className = 'auth-modal__error';
   authError.hidden = true;
+
   const footer = document.createElement('div');
   footer.className = 'auth-modal__footer';
+
   const footerText = document.createElement('span');
   footerText.className = 'auth-modal__footer-text';
+
   const footerButton = document.createElement('button');
   footerButton.type = 'button';
   footerButton.className = 'auth-modal__footer-button';
+
   footer.append(footerText, footerButton);
+
+  const googleProvider = new GoogleAuthProvider();
 
   function setAuthPending(isPending: boolean): void {
     isAuthPending = isPending;
+
     for (const element of modal.querySelectorAll<
       HTMLInputElement | HTMLButtonElement
     >('input, button')) {
@@ -116,9 +137,28 @@ export function createAuthModal(
     authError.hidden = true;
   }
 
+  const googleButton = createGoogleButton(async () => {
+    hideAuthError();
+
+    try {
+      setAuthPending(true);
+
+      await signInWithPopup(auth, googleProvider);
+
+      setAuthPending(false);
+      modal.close();
+    } catch (error) {
+      console.error('Google sign-in failed:', error);
+
+      setAuthPending(false);
+      showAuthError(getAuthErrorMessage(error));
+    }
+  });
+
   function renderLogin(): void {
     let isEmailValid = false;
     let isPasswordValid = false;
+
     const emailField = createTextInputField({
       label: 'Email',
       type: 'email',
@@ -132,6 +172,7 @@ export function createAuthModal(
         updateSubmitButton();
       },
     });
+
     const passwordField = createTextInputField({
       label: 'Password',
       type: 'password',
@@ -145,8 +186,10 @@ export function createAuthModal(
         updateSubmitButton();
       },
     });
+
     const forgotPassword = createTextLink('', '');
     forgotPassword.textContent = 'Forgot password?';
+
     const loginButton = createPlayOrDetailsButton({
       variant: 'play',
       title: 'Login',
@@ -154,6 +197,7 @@ export function createAuthModal(
         const email =
           emailField.querySelector<HTMLInputElement>('input')?.value.trim() ??
           '';
+
         const password =
           passwordField.querySelector<HTMLInputElement>('input')?.value ?? '';
 
@@ -162,11 +206,14 @@ export function createAuthModal(
         try {
           setAuthPending(true);
           loginButton.textContent = 'Loading...';
+
           await signInWithEmailAndPassword(auth, email, password);
+
           setAuthPending(false);
           modal.close();
         } catch (error) {
           console.error('Login failed:', error);
+
           setAuthPending(false);
           loginButton.textContent = 'Login';
           updateSubmitButton();
@@ -175,8 +222,8 @@ export function createAuthModal(
         }
       },
     });
+
     const divider = createDivider();
-    const googleButton = createGoogleButton(() => {});
 
     function updateSubmitButton(): void {
       loginButton.disabled =
@@ -184,6 +231,7 @@ export function createAuthModal(
     }
 
     loginButton.disabled = true;
+
     form.append(
       emailField,
       passwordField,
@@ -192,6 +240,7 @@ export function createAuthModal(
       divider,
       googleButton,
     );
+
     footerText.textContent = "Don't have an account?";
     footerButton.textContent = 'Register';
   }
@@ -203,6 +252,7 @@ export function createAuthModal(
     let isConfirmPasswordValid = false;
     let passwordValue = '';
     let confirmPasswordValue = '';
+
     const usernameField = createTextInputField({
       label: 'Username',
       type: 'text',
@@ -217,6 +267,7 @@ export function createAuthModal(
         updateSubmitButton();
       },
     });
+
     const emailField = createTextInputField({
       label: 'Email',
       type: 'email',
@@ -230,6 +281,7 @@ export function createAuthModal(
         updateSubmitButton();
       },
     });
+
     const confirmPasswordField = createTextInputField({
       label: 'Confirm Password',
       type: 'password',
@@ -247,6 +299,7 @@ export function createAuthModal(
         updateSubmitButton();
       },
     });
+
     const passwordField = createTextInputField({
       label: 'Password',
       type: 'password',
@@ -258,9 +311,11 @@ export function createAuthModal(
       validate: isValidRegisterPassword,
       onChange: (value) => {
         passwordValue = value;
+
         if (confirmPasswordValue.length > 0) {
           confirmPasswordField.validate();
         }
+
         updateSubmitButton();
       },
       onValidChange: (isValid) => {
@@ -268,6 +323,7 @@ export function createAuthModal(
         updateSubmitButton();
       },
     });
+
     const registerButton = createPlayOrDetailsButton({
       variant: 'play',
       title: 'Create Account',
@@ -276,9 +332,11 @@ export function createAuthModal(
           usernameField
             .querySelector<HTMLInputElement>('input')
             ?.value.trim() ?? '';
+
         const email =
           emailField.querySelector<HTMLInputElement>('input')?.value.trim() ??
           '';
+
         const password =
           passwordField.querySelector<HTMLInputElement>('input')?.value ?? '';
 
@@ -287,16 +345,22 @@ export function createAuthModal(
         try {
           setAuthPending(true);
           registerButton.textContent = 'Loading...';
+
           const userCredential = await createUserWithEmailAndPassword(
             auth,
             email,
             password,
           );
-          await updateProfile(userCredential.user, { displayName: username });
+
+          await updateProfile(userCredential.user, {
+            displayName: username,
+          });
+
           setAuthPending(false);
           modal.close();
         } catch (error) {
           console.error('Registration failed:', error);
+
           setAuthPending(false);
           registerButton.textContent = 'Create Account';
           updateSubmitButton();
@@ -305,8 +369,8 @@ export function createAuthModal(
         }
       },
     });
+
     const divider = createDivider();
-    const googleButton = createGoogleButton(() => {});
 
     function updateSubmitButton(): void {
       registerButton.disabled =
@@ -320,6 +384,7 @@ export function createAuthModal(
     }
 
     registerButton.disabled = true;
+
     form.append(
       usernameField,
       emailField,
@@ -329,28 +394,36 @@ export function createAuthModal(
       divider,
       googleButton,
     );
+
     footerText.textContent = 'Already have an account?';
     footerButton.textContent = 'Log In';
   }
 
   function render(): void {
     tabSwitcherContainer.replaceChildren();
+
     const tabSwitcher = createAuthTabSwitcher(activeTab, (tab: AuthTab) => {
       if (isAuthPending) {
         return;
       }
+
       activeTab = tab;
       onTabChange?.(tab);
       render();
     });
+
     tabSwitcherContainer.append(tabSwitcher);
+
     title.textContent =
       activeTab === 'login' ? 'Welcome Back!' : 'Create Account';
+
     description.textContent =
       activeTab === 'login'
         ? 'Sign in to resume your games and progress.'
         : 'Join MiniGames to track your score & streak.';
+
     form.replaceChildren();
+
     if (activeTab === 'login') {
       renderLogin();
     } else {
@@ -362,10 +435,12 @@ export function createAuthModal(
     if (isAuthPending) {
       return;
     }
+
     activeTab = activeTab === 'login' ? 'register' : 'login';
     onTabChange?.(activeTab);
     render();
   });
+
   content.append(
     tabSwitcherContainer,
     headerContainer,
@@ -373,15 +448,19 @@ export function createAuthModal(
     authError,
     footer,
   );
+
   container.append(content);
   modal.append(container);
+
   render();
+
   return {
     modal,
     open: (tab: AuthTab) => {
       activeTab = tab;
       setAuthPending(false);
       render();
+
       if (!modal.open) {
         modal.showModal();
       }
