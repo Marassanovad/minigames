@@ -10,7 +10,11 @@ import { createFavoriteButton } from '../favorite-button/favorite-button.ts';
 import { formatCompactNumber } from '../../utils/compact-number.ts';
 import { getTimeAgo } from '../../utils/time-ago.ts';
 import { createCommentLikeButton } from '../comment-like-button/comment-like-button.ts';
-import { getComments, postComment } from '../../api/comments-api.ts';
+import {
+  getComments,
+  postComment,
+  toggleCommentLike,
+} from '../../api/comments-api.ts';
 import { getGame, toggleFavorite } from '../../api/game-api.ts';
 import { createSendButton } from '../send-button/send-button.ts';
 import { createCommentInput } from '../comment-input/comment-input.ts';
@@ -82,7 +86,7 @@ export function createGameDialog({
       if (title instanceof HTMLElement) {
         title.textContent = `Comments (${response.meta.totalComments})`;
       }
-      renderComments(commentsContainer, response.data);
+      renderComments(commentsContainer, response.data, dialog, onLogin);
     } catch {
       showCommentsError(commentsContainer);
     }
@@ -250,7 +254,12 @@ export function createGameDialog({
   }
 }
 
-function renderComments(container: HTMLElement, comments: Comment[]): void {
+function renderComments(
+  container: HTMLElement,
+  comments: Comment[],
+  dialog: HTMLDialogElement,
+  onLogin: () => void,
+): void {
   container.replaceChildren();
 
   if (comments.length === 0) {
@@ -267,7 +276,7 @@ function renderComments(container: HTMLElement, comments: Comment[]): void {
   list.className = 'game-dialog__comments-list';
 
   for (const comment of comments) {
-    const item = createComment(comment);
+    const item = createComment(comment, dialog, onLogin);
 
     list.append(item);
   }
@@ -379,7 +388,11 @@ function showCommentsLoading(container: HTMLElement): void {
   container.append(loading);
 }
 
-function createComment(comment: Comment): HTMLElement {
+function createComment(
+  comment: Comment,
+  dialog: HTMLDialogElement,
+  onLogin: () => void,
+): HTMLElement {
   const item = document.createElement('article');
   item.className = 'game-dialog__comment';
 
@@ -413,11 +426,52 @@ function createComment(comment: Comment): HTMLElement {
   text.className = 'game-dialog__comment-text';
   text.textContent = comment.text;
 
+  let isLikeRequestPending = false;
+
   const likes = createCommentLikeButton(
     comment.likesCount,
     comment.isLikedByCurrentUser,
-    () => {
-      // Like action will be implemented in Story 4
+    async () => {
+      if (isLikeRequestPending) {
+        return;
+      }
+
+      const user = auth.currentUser;
+
+      if (!user?.email) {
+        createSnackbar('Please log in to like comments.', dialog);
+        onLogin();
+        return;
+      }
+
+      isLikeRequestPending = true;
+      likes.disabled = true;
+      likes.classList.add('is-loading');
+
+      try {
+        const response = await toggleCommentLike(comment.commentId, {
+          userEmail: user.email,
+        });
+
+        likes.classList.toggle('is-liked', response.data.isLikedByCurrentUser);
+
+        const count = likes.querySelector('span:last-child');
+
+        if (count) {
+          count.textContent = String(response.data.likesCount);
+        }
+      } catch (error) {
+        console.error('Failed to toggle comment like:', error);
+
+        createSnackbar(
+          'Failed to update comment like. Please try again.',
+          dialog,
+        );
+      } finally {
+        isLikeRequestPending = false;
+        likes.disabled = false;
+        likes.classList.remove('is-loading');
+      }
     },
   );
   item.append(header, text, likes);

@@ -40,14 +40,10 @@ export function postComment(
 }
 
 export function toggleCommentLike(
-  gameSlug: string,
   commentId: string,
   body: {
     userEmail: string;
   },
 ): Promise<PostCommentLikeResponse> {
-  return post<PostCommentLikeResponse>(
-    `/games/${gameSlug}/comments/${commentId}/like`,
-    body,
-  );
+  return post<PostCommentLikeResponse>(`/comments/${commentId}/like`, body);
 }
