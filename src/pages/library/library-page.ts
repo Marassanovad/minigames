@@ -12,6 +12,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 import type { SortOption } from '../../types/sort.ts';
 import { getRouteState, navigate } from '../../app/router.ts';
+import {createSnackbar} from "../../components/snackbar/snackbar.ts";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -20,6 +21,17 @@ export function renderLibraryPage(): HTMLElement {
   page.className = 'library-page';
 
   const route = getRouteState();
+
+  if (auth.currentUser && route.auth) {
+    const url = new URL(globalThis.location.href);
+
+    url.searchParams.delete('auth');
+    globalThis.history.replaceState({}, '', url);
+
+    route.auth = undefined;
+
+    createSnackbar('You are already signed in.');
+  }
 
   let activeFilter = route.category ?? 'all';
 
