@@ -12,7 +12,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 import type { SortOption } from '../../types/sort.ts';
 import { getRouteState, navigate } from '../../app/router.ts';
-import {createSnackbar} from "../../components/snackbar/snackbar.ts";
+import { createSnackbar } from '../../components/snackbar/snackbar.ts';
 
 const ITEMS_PER_PAGE = 6;
 

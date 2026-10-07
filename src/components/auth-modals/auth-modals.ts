@@ -148,9 +148,9 @@ export function createAuthModal(
 
       if (auth.currentUser?.email) {
         saveAppSession(
-            auth.currentUser.displayName || '',
-            auth.currentUser.email,
-            auth.currentUser.photoURL || undefined,
+          auth.currentUser.displayName || '',
+          auth.currentUser.email,
+          auth.currentUser.photoURL || undefined,
         );
       }
 
@@ -220,9 +220,9 @@ export function createAuthModal(
 
           if (auth.currentUser?.email) {
             saveAppSession(
-                auth.currentUser.displayName || '',
-                auth.currentUser.email,
-                auth.currentUser.photoURL || undefined,
+              auth.currentUser.displayName || '',
+              auth.currentUser.email,
+              auth.currentUser.photoURL || undefined,
             );
           }
 
@@ -375,9 +375,9 @@ export function createAuthModal(
 
           if (userCredential.user.email) {
             saveAppSession(
-                userCredential.user.displayName || '',
-                userCredential.user.email,
-                userCredential.user.photoURL || undefined,
+              userCredential.user.displayName || '',
+              userCredential.user.email,
+              userCredential.user.photoURL || undefined,
             );
           }
 

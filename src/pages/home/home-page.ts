@@ -8,7 +8,7 @@ import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
 import { getRouteState, navigate } from '../../app/router.ts';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
-import {createSnackbar} from "../../components/snackbar/snackbar.ts";
+import { createSnackbar } from '../../components/snackbar/snackbar.ts';
 
 export function renderHomePage(): HTMLElement {
   const page = document.createElement('main');
