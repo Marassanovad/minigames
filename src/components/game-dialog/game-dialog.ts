@@ -360,7 +360,7 @@ function createCommentsSection(
   onAuthStateChanged(auth, (currentUser) => {
     if (currentUser?.email && currentUser.displayName) {
       send.style.display = '';
-      user.textContent = currentUser.displayName.charAt(0).toUpperCase();
+      user.textContent = currentUser.displayName.trim().charAt(0).toUpperCase();
     } else {
       send.style.display = 'none';
     }
@@ -391,7 +391,11 @@ function createComment(comment: Comment): HTMLElement {
 
   const avatar = document.createElement('span');
   avatar.className = 'game-dialog__comment-avatar';
-  avatar.textContent = comment.authorName.charAt(0).toUpperCase();
+
+  const avatarColor = Math.floor(Math.random() * 5) + 1;
+  avatar.classList.add(`avatar-random-${avatarColor}`);
+
+  avatar.textContent = comment.authorName.trim().charAt(0).toUpperCase();
 
   const authorName = document.createElement('span');
   authorName.className = 'game-dialog__comment-name';

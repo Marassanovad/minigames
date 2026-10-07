@@ -210,12 +210,31 @@
 
       padding: $button-icon;
 
-      background: $color-avatar-random-4;
       border: 1px solid $color-on-primary;
       border-radius: $corner-full;
 
       font-size: $font-size-label-medium;
       font-weight: $font-weight-bold;
+
+      &.avatar-random-1 {
+        background: $color-avatar-random-1;
+      }
+
+      &.avatar-random-2 {
+        background: $color-avatar-random-2;
+      }
+
+      &.avatar-random-3 {
+        background: $color-avatar-random-3;
+      }
+
+      &.avatar-random-4 {
+        background: $color-avatar-random-4;
+      }
+
+      &.avatar-random-5 {
+        background: $color-avatar-random-5;
+      }
     }
 
     &-date {
