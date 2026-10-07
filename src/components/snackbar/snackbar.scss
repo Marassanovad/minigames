@@ -1,0 +1,14 @@
+@use '../../styles/tokens' as *;
+
+.snackbar {
+  position: fixed;
+  top: $spacing-3;
+  right: $spacing-3;
+  z-index: 1001;
+
+  padding: $button-large-padding;
+  border-radius: $corner-small;
+
+  background: $color-bg-footer;
+  color: $color-white;
+}

@@ -10,9 +10,7 @@ import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
 import { createGameDialog } from '../../components/game-dialog/game-dialog.ts';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
-
 import type { SortOption } from '../../types/sort.ts';
-
 import { getRouteState, navigate } from '../../app/router.ts';
 
 const ITEMS_PER_PAGE = 6;
@@ -136,6 +134,10 @@ export function renderLibraryPage(): HTMLElement {
   const gameDialog = route.game
     ? createGameDialog({
         gameSlug: route.game,
+
+        onLogin: () => {
+          authModal.open('login');
+        },
 
         onClose: () => {
           navigate({

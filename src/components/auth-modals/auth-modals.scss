@@ -1,6 +1,7 @@
 @use '../../styles/tokens' as *;
 
 .auth-modal {
+  position: relative;
   width: calc(100% - $spacing-2);
   max-width: 420px;
   background: $color-background;
