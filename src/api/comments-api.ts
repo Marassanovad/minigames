@@ -1,7 +1,10 @@
-import { get } from './api';
+import { get, post } from './api';
 import type {
   CommentsResponse,
   GetCommentsParameters,
+  PostCommentLikeResponse,
+  PostCommentParameters,
+  PostCommentResponse,
 } from '../types/comments';
 
 export function getComments(
@@ -26,5 +29,25 @@ export function getComments(
 
   return get<CommentsResponse>(
     `/games/${gameSlug}/comments${query ? `?${query}` : ''}`,
+  );
+}
+
+export function postComment(
+  gameSlug: string,
+  body: PostCommentParameters,
+): Promise<PostCommentResponse> {
+  return post<PostCommentResponse>(`/games/${gameSlug}/comments`, body);
+}
+
+export function toggleCommentLike(
+  gameSlug: string,
+  commentId: string,
+  body: {
+    userEmail: string;
+  },
+): Promise<PostCommentLikeResponse> {
+  return post<PostCommentLikeResponse>(
+    `/games/${gameSlug}/comments/${commentId}/like`,
+    body,
   );
 }

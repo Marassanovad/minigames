@@ -21,3 +21,27 @@ export interface GetCommentsParameters {
   sort?: 'newest' | 'oldest';
   userEmail?: string;
 }
+
+export interface PostCommentParameters {
+  userEmail: string;
+  authorName: string;
+  text: string;
+}
+
+export interface PostCommentResponse {
+  data: {
+    commentId: string;
+    authorName: string;
+    text: string;
+    likesCount: number;
+    isLikedByCurrentUser: boolean;
+    createdAt: string;
+  };
+}
+
+export interface PostCommentLikeResponse {
+  data: {
+    isLikedByCurrentUser: boolean;
+    likesCount: number;
+  };
+}
