@@ -21,7 +21,7 @@ export interface RouteState {
   auth?: 'login' | 'register';
 }
 
-export function initRouter(): void {
+export async function initRouter(): Promise<void> {
   const app = document.querySelector<HTMLElement>('#app');
 
   if (!app) {

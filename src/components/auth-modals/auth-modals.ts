@@ -16,6 +16,7 @@ import { createPlayOrDetailsButton } from '../play-or-details-button/play-or-det
 import { createTextLink } from '../text-link/text-link.ts';
 import { createDivider } from './divider/divider.ts';
 import { createGoogleButton } from './google-button/google-button.ts';
+import { saveAppSession } from '../../utils/app-session';
 
 interface AuthModal {
   modal: HTMLDialogElement;
@@ -145,6 +146,14 @@ export function createAuthModal(
 
       await signInWithPopup(auth, googleProvider);
 
+      if (auth.currentUser?.email) {
+        saveAppSession(
+          auth.currentUser.displayName || '',
+          auth.currentUser.email,
+          auth.currentUser.photoURL || undefined,
+        );
+      }
+
       setAuthPending(false);
       modal.close();
     } catch (error) {
@@ -208,6 +217,14 @@ export function createAuthModal(
           loginButton.textContent = 'Loading...';
 
           await signInWithEmailAndPassword(auth, email, password);
+
+          if (auth.currentUser?.email) {
+            saveAppSession(
+              auth.currentUser.displayName || '',
+              auth.currentUser.email,
+              auth.currentUser.photoURL || undefined,
+            );
+          }
 
           setAuthPending(false);
           modal.close();
@@ -355,6 +372,14 @@ export function createAuthModal(
           await updateProfile(userCredential.user, {
             displayName: username,
           });
+
+          if (userCredential.user.email) {
+            saveAppSession(
+              userCredential.user.displayName || '',
+              userCredential.user.email,
+              userCredential.user.photoURL || undefined,
+            );
+          }
 
           setAuthPending(false);
           modal.close();
