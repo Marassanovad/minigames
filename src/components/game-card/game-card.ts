@@ -3,6 +3,7 @@ import './game-card.scss';
 import { getGameImage } from '../../data/game-images.ts';
 import starIcon from '../../assets/icons/star.svg?raw';
 import likeIcon from '../../assets/icons/like.svg?raw';
+import { formatCompactNumber } from '../../utils/compact-number.ts';
 
 export type GameCardPosition = 'far' | 'near' | 'selected';
 
@@ -48,17 +49,11 @@ export function createGameCard({
   const likes = document.createElement('span');
   likes.className = 'game-card__likes';
   likes.innerHTML = likeIcon;
-  likes.insertAdjacentText('beforeend', formatLikes(game.likesCount));
+  likes.insertAdjacentText('beforeend', formatCompactNumber(game.likesCount));
 
   stats.append(rating, likes);
   overlay.append(name, stats);
   card.append(image, overlay);
 
   return card;
-}
-
-function formatLikes(likesCount: number): string {
-  return likesCount >= 1000
-    ? `${(likesCount / 1000).toFixed(1)}K`
-    : String(likesCount);
 }
