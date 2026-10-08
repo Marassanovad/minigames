@@ -2,7 +2,9 @@
 
 .favorite-button {
   box-sizing: border-box;
+  padding: $button-large-padding;
   height: 48px;
+  width: 268px;
 
   display: inline-flex;
   align-items: center;
@@ -38,19 +40,29 @@
     font-size: $font-size-body-medium;
   }
 
-  &--icon {
-    width: 48px;
-    padding: $button-icon;
-  }
-
-  &--text {
-    width: 268px;
-    padding: $button-large-padding;
-  }
-
   &.is-favorite {
     .favorite-button__icon {
       color: $color-like;
+    }
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  &.is-loading {
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .favorite-button {
+    width: 48px;
+    padding: $button-icon;
+
+    &__text {
+      display: none;
     }
   }
 }

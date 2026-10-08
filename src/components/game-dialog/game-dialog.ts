@@ -1,36 +1,38 @@
 import './game-dialog.scss';
 import likeIcon from '../../assets/icons/like.svg?raw';
 import starIcon from '../../assets/icons/star.svg?raw';
-import type {
-  GameDetails,
-  GameDetailsRecord,
-  GameDetailsSpecs,
-} from '../../types/game.ts';
+import type { GameDetails } from '../../types/game.ts';
 import type { Comment } from '../../types/comments.ts';
 import { getGameImage } from '../../data/game-images.ts';
 import { createCloseButton } from '../close-button/close-button.ts';
 import { createPlayOrDetailsButton } from '../play-or-details-button/play-or-details-button.ts';
-import {
-  createFavoriteButton,
-  type FavoriteButtonElement,
-} from '../favorite-button/favorite-button.ts';
-import { formatNumber } from '../../utils/format-number.ts';
+import { createFavoriteButton } from '../favorite-button/favorite-button.ts';
 import { formatCompactNumber } from '../../utils/compact-number.ts';
 import { getTimeAgo } from '../../utils/time-ago.ts';
-import { getMedal } from '../../utils/get-medal.ts';
 import { createCommentLikeButton } from '../comment-like-button/comment-like-button.ts';
-import { getComments } from '../../api/comments-api.ts';
-import { getGame } from '../../api/game-api.ts';
+import {
+  getComments,
+  postComment,
+  toggleCommentLike,
+} from '../../api/comments-api.ts';
+import { getGame, toggleFavorite } from '../../api/game-api.ts';
 import { createSendButton } from '../send-button/send-button.ts';
 import { createCommentInput } from '../comment-input/comment-input.ts';
+import { auth } from '../../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { createSnackbar } from '../snackbar/snackbar.ts';
+import { createSpecs } from './sections/specs.ts';
+import { createTopRecords } from './sections/top-records.ts';
 
 interface GameDialogOptions {
   gameSlug: string;
+  onLogin: () => void;
   onClose?: () => void;
 }
 
 export function createGameDialog({
   gameSlug,
+  onLogin,
   onClose,
 }: GameDialogOptions): HTMLDialogElement {
   const dialog = document.createElement('dialog');
@@ -50,7 +52,12 @@ export function createGameDialog({
   async function loadGameDetails(): Promise<void> {
     showLoading();
     try {
-      const response = await getGame(gameSlug);
+      const userEmail = auth.currentUser?.email;
+
+      const response = await getGame(gameSlug, {
+        userEmail: userEmail ?? undefined,
+      });
+
       renderGame(response.data);
       void loadComments();
     } catch {
@@ -67,15 +74,19 @@ export function createGameDialog({
     }
     showCommentsLoading(commentsContainer);
     try {
+      const userEmail = auth.currentUser?.email;
+
       const response = await getComments(gameSlug, {
         limit: 3,
         sort: 'newest',
+        userEmail: userEmail ?? undefined,
       });
+
       const title = content.querySelector('.game-dialog__comments-title');
       if (title instanceof HTMLElement) {
         title.textContent = `Comments (${response.meta.totalComments})`;
       }
-      renderComments(commentsContainer, response.data);
+      renderComments(commentsContainer, response.data, dialog, onLogin);
     } catch {
       showCommentsError(commentsContainer);
     }
@@ -131,40 +142,60 @@ export function createGameDialog({
         // play / purchase action
       },
     });
-    let isFavorite = game.isLikedByCurrentUser;
-    const favoriteButtons: FavoriteButtonElement[] = [];
-    const toggleFavorite = (): void => {
-      isFavorite = !isFavorite;
-      for (const button of favoriteButtons) {
-        button.setFavorite(isFavorite);
-      }
-    };
+
+    let isFavoriteRequestPending = false;
+
     const favoriteButton = createFavoriteButton({
-      variant: 'text',
-      isFavorite,
-      onClick: toggleFavorite,
-    });
-    favoriteButton.classList.add(
-      'game-dialog__favorite-button',
-      'desktop-only',
-    );
+      isFavorite: game.isLikedByCurrentUser,
+      onClick: async () => {
+        if (isFavoriteRequestPending) {
+          return;
+        }
 
-    const favoriteButton2 = createFavoriteButton({
-      variant: 'icon',
-      isFavorite,
-      onClick: toggleFavorite,
-    });
-    favoriteButton2.classList.add(
-      'game-dialog__favorite-button',
-      'mobile-only',
-    );
+        const user = auth.currentUser;
 
-    favoriteButtons.push(favoriteButton, favoriteButton2);
-    actionButtons.append(playButton, favoriteButton, favoriteButton2);
+        if (!user?.email) {
+          createSnackbar('Please log in to add games to favorites.', dialog);
+          onLogin();
+          return;
+        }
+
+        isFavoriteRequestPending = true;
+        favoriteButton.setLoading(true);
+
+        try {
+          const response = await toggleFavorite(game.slug, {
+            userEmail: user.email,
+          });
+
+          favoriteButton.setFavorite(response.data.isFavorited);
+
+          likes.replaceChildren();
+          likes.innerHTML = likeIcon;
+          likes.insertAdjacentText(
+            'beforeend',
+            formatCompactNumber(response.data.likesCount),
+          );
+        } catch (error) {
+          console.error('Failed to toggle favorite:', error);
+          createSnackbar(
+            'Failed to update favorites. Please try again.',
+            dialog,
+          );
+        } finally {
+          isFavoriteRequestPending = false;
+          favoriteButton.setLoading(false);
+        }
+      },
+    });
+
+    favoriteButton.classList.add('game-dialog__favorite-button');
+
+    actionButtons.append(playButton, favoriteButton);
 
     const specs = createSpecs(game.specs);
     const records = createTopRecords(game.topRecords);
-    const comments = createCommentsSection();
+    const comments = createCommentsSection(dialog, gameSlug, loadComments);
 
     titleContent.append(title, stats);
     body.append(
@@ -223,7 +254,12 @@ export function createGameDialog({
   }
 }
 
-function renderComments(container: HTMLElement, comments: Comment[]): void {
+function renderComments(
+  container: HTMLElement,
+  comments: Comment[],
+  dialog: HTMLDialogElement,
+  onLogin: () => void,
+): void {
   container.replaceChildren();
 
   if (comments.length === 0) {
@@ -240,7 +276,7 @@ function renderComments(container: HTMLElement, comments: Comment[]): void {
   list.className = 'game-dialog__comments-list';
 
   for (const comment of comments) {
-    const item = createComment(comment);
+    const item = createComment(comment, dialog, onLogin);
 
     list.append(item);
   }
@@ -248,7 +284,11 @@ function renderComments(container: HTMLElement, comments: Comment[]): void {
   container.append(list);
 }
 
-function createCommentsSection(): HTMLElement {
+function createCommentsSection(
+  dialog: HTMLDialogElement,
+  gameSlug: string,
+  loadComments: () => Promise<void>,
+): HTMLElement {
   const section = document.createElement('section');
   section.className = 'game-dialog__comments';
 
@@ -261,18 +301,80 @@ function createCommentsSection(): HTMLElement {
 
   const user = document.createElement('div');
   user.className = 'game-dialog__comments-user';
-  user.textContent = 'U';
 
-  const commentInput = createCommentInput('Write a comment...');
-  const sendButton = createSendButton(() => {
-    // Comment sending will be implemented later
+  let isCommentRequestPending = false;
+
+  const handleSubmit = async (): Promise<void> => {
+    if (isCommentRequestPending) {
+      return;
+    }
+
+    const user = auth.currentUser;
+
+    if (!user?.email || !user.displayName) {
+      return;
+    }
+
+    const text = commentInput.getValue().trim();
+
+    if (!text) {
+      createSnackbar('Comment cannot be empty.', dialog);
+      return;
+    }
+
+    if (text.length > 500) {
+      createSnackbar('Comment must be 500 characters or less.', dialog);
+      return;
+    }
+
+    isCommentRequestPending = true;
+    commentInput.setLoading(true);
+    sendButton.setLoading(true);
+
+    try {
+      await postComment(gameSlug, {
+        userEmail: user.email,
+        authorName: user.displayName,
+        text,
+      });
+
+      commentInput.clear();
+
+      await loadComments();
+    } catch (error) {
+      console.error('Failed to post comment:', error);
+      createSnackbar('Failed to send comment. Please try again.', dialog);
+    } finally {
+      isCommentRequestPending = false;
+      commentInput.setLoading(false);
+      sendButton.setLoading(false);
+    }
+  };
+
+  const commentInput = createCommentInput('Write a comment...', () => {
+    void handleSubmit();
   });
+
+  const sendButton = createSendButton(() => {
+    void handleSubmit();
+  });
+
   send.append(user, commentInput, sendButton);
 
   const commentsContent = document.createElement('div');
   commentsContent.className = 'game-dialog__comments-content';
 
   section.append(title, send, commentsContent);
+
+  onAuthStateChanged(auth, (currentUser) => {
+    if (currentUser?.email && currentUser.displayName) {
+      send.style.display = '';
+      user.textContent = currentUser.displayName.trim().charAt(0).toUpperCase();
+    } else {
+      send.style.display = 'none';
+    }
+  });
+
   return section;
 }
 
@@ -286,7 +388,11 @@ function showCommentsLoading(container: HTMLElement): void {
   container.append(loading);
 }
 
-function createComment(comment: Comment): HTMLElement {
+function createComment(
+  comment: Comment,
+  dialog: HTMLDialogElement,
+  onLogin: () => void,
+): HTMLElement {
   const item = document.createElement('article');
   item.className = 'game-dialog__comment';
 
@@ -298,7 +404,11 @@ function createComment(comment: Comment): HTMLElement {
 
   const avatar = document.createElement('span');
   avatar.className = 'game-dialog__comment-avatar';
-  avatar.textContent = comment.authorName.charAt(0).toUpperCase();
+
+  const avatarColor = Math.floor(Math.random() * 5) + 1;
+  avatar.classList.add(`avatar-random-${avatarColor}`);
+
+  avatar.textContent = comment.authorName.trim().charAt(0).toUpperCase();
 
   const authorName = document.createElement('span');
   authorName.className = 'game-dialog__comment-name';
@@ -316,88 +426,54 @@ function createComment(comment: Comment): HTMLElement {
   text.className = 'game-dialog__comment-text';
   text.textContent = comment.text;
 
+  let isLikeRequestPending = false;
+
   const likes = createCommentLikeButton(
     comment.likesCount,
     comment.isLikedByCurrentUser,
-    () => {
-      // Like action will be implemented in Story 4
+    async () => {
+      if (isLikeRequestPending) {
+        return;
+      }
+
+      const user = auth.currentUser;
+
+      if (!user?.email) {
+        createSnackbar('Please log in to like comments.', dialog);
+        onLogin();
+        return;
+      }
+
+      isLikeRequestPending = true;
+      likes.disabled = true;
+      likes.classList.add('is-loading');
+
+      try {
+        const response = await toggleCommentLike(comment.commentId, {
+          userEmail: user.email,
+        });
+
+        likes.classList.toggle('is-liked', response.data.isLikedByCurrentUser);
+
+        const count = likes.querySelector('span:last-child');
+
+        if (count) {
+          count.textContent = String(response.data.likesCount);
+        }
+      } catch (error) {
+        console.error('Failed to toggle comment like:', error);
+
+        createSnackbar(
+          'Failed to update comment like. Please try again.',
+          dialog,
+        );
+      } finally {
+        isLikeRequestPending = false;
+        likes.disabled = false;
+        likes.classList.remove('is-loading');
+      }
     },
   );
   item.append(header, text, likes);
   return item;
-}
-
-function createSpecs(specs: GameDetailsSpecs): HTMLElement {
-  const container = document.createElement('div');
-  container.className = 'game-dialog__specs';
-
-  const items = [
-    ['Genre', specs.genre],
-    ['Players', specs.players],
-    ['Duration', specs.duration],
-    ['Price', specs.price],
-  ];
-  for (const [label, value] of items) {
-    const item = document.createElement('div');
-    item.className = 'game-dialog__spec';
-
-    const itemLabel = document.createElement('span');
-    itemLabel.className = 'game-dialog__spec-label';
-    itemLabel.textContent = label;
-
-    const itemValue = document.createElement('span');
-    itemValue.className = 'game-dialog__spec-value';
-    itemValue.textContent = value;
-
-    item.append(itemLabel, itemValue);
-    container.append(item);
-  }
-  return container;
-}
-
-function createTopRecords(records: GameDetailsRecord[]): HTMLElement {
-  const section = document.createElement('section');
-  section.className = 'game-dialog__records';
-
-  const title = document.createElement('h3');
-  title.className = 'game-dialog__records-title';
-  title.textContent = '🏆 Top Records';
-
-  const list = document.createElement('ol');
-  list.className = 'game-dialog__records-list';
-
-  for (const record of records) {
-    const item = document.createElement('li');
-    item.className = 'game-dialog__record';
-
-    const player = document.createElement('div');
-    player.className = 'game-dialog__record-player';
-
-    const medal = document.createElement('span');
-    medal.className = 'game-dialog__record-medal';
-    medal.textContent = getMedal(record.position);
-    medal.setAttribute('aria-hidden', 'true');
-
-    const playerName = document.createElement('span');
-    playerName.className = 'game-dialog__record-name';
-    playerName.textContent = record.playerName;
-    player.append(medal, playerName);
-
-    const result = document.createElement('div');
-    result.className = 'game-dialog__record-result';
-
-    const score = document.createElement('span');
-    score.className = 'game-dialog__record-score';
-    score.textContent = formatNumber(record.score);
-
-    const timeAgo = document.createElement('span');
-    timeAgo.className = 'game-dialog__record-time';
-    timeAgo.textContent = getTimeAgo(record.achievedAt);
-
-    result.append(score, timeAgo);
-    item.append(player, result);
-    list.append(item);
-  }
-  section.append(title, list);
-  return section;
 }

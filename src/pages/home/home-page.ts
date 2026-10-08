@@ -6,6 +6,9 @@ import { createDeveloper } from './sections/developer/developer.ts';
 import { createTopPlayers } from './sections/top-players/top-players.ts';
 import { createAuthModal } from '../../components/auth-modals/auth-modals.ts';
 import { getRouteState, navigate } from '../../app/router.ts';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase';
+import { createSnackbar } from '../../components/snackbar/snackbar.ts';
 
 export function renderHomePage(): HTMLElement {
   const page = document.createElement('main');
@@ -27,6 +30,9 @@ export function renderHomePage(): HTMLElement {
     onSignup: () => {
       navigate({ path: '/', auth: 'register' });
     },
+    onLogout: async () => {
+      await signOut(auth);
+    },
   });
   const hero = createHero();
   const games = createNewGames();
@@ -34,6 +40,18 @@ export function renderHomePage(): HTMLElement {
   const developer = createDeveloper();
   const footer = createFooter();
   page.append(header, hero, games, players, developer, footer, authModal.modal);
+
+  if (auth.currentUser && route.auth) {
+    const url = new URL(globalThis.location.href);
+
+    url.searchParams.delete('auth');
+    globalThis.history.replaceState({}, '', url);
+
+    route.auth = undefined;
+
+    createSnackbar('You are already signed in.');
+  }
+
   if (route.auth) {
     queueMicrotask(() => {
       authModal.open(route.auth!);

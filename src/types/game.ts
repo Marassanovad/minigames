@@ -53,3 +53,11 @@ export interface GameDetails {
 export interface GameDetailsResponse {
   data: GameDetails;
 }
+
+export interface FavoriteResponse {
+  data: {
+    gameSlug: string;
+    isFavorited: boolean;
+    likesCount: number;
+  };
+}

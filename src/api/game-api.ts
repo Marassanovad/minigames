@@ -1,6 +1,10 @@
 import { get, post } from './api';
 import type { SortOption } from '../types/sort';
-import type { GameDetailsResponse, GamesResponse } from '../types/game.ts';
+import type {
+  FavoriteResponse,
+  GameDetailsResponse,
+  GamesResponse,
+} from '../types/game.ts';
 
 export interface GetGamesParameters {
   featured?: boolean;
@@ -66,5 +70,5 @@ export function getGame(
 }
 
 export function toggleFavorite(gameSlug: string, body: ToggleFavoriteRequest) {
-  return post(`/games/${gameSlug}/favorite`, body);
+  return post<FavoriteResponse>(`/games/${gameSlug}/favorite`, body);
 }

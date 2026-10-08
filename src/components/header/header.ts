@@ -9,10 +9,10 @@ import {
 } from '../burger-menu-button/mobile-menu/mobile-menu.ts';
 import { createUserAvatar } from '../../utils/create-avatar.ts';
 import { createLogo } from '../../utils/create-logo.ts';
+import { auth } from '../../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 interface HeaderOptions {
-  username?: string;
-  isAuthenticated?: boolean;
   onLogin?: () => void;
   onSignup?: () => void;
   onLogout?: () => void;
@@ -20,8 +20,6 @@ interface HeaderOptions {
 }
 
 export function createHeader({
-  username = '',
-  isAuthenticated = false,
   onLogin = () => {},
   onSignup = () => {},
   onLogout = () => {},
@@ -36,37 +34,14 @@ export function createHeader({
   const navActions = document.createElement('div');
   navActions.className = 'header__nav-actions';
 
-  const actions = document.createElement('div');
-  actions.className = 'header__actions';
-
   const navigation = createNavigation();
   navActions.append(navigation);
 
-  if (isAuthenticated) {
-    const user = document.createElement('div');
-    user.className = 'header__user';
-
-    const usernameElement = document.createElement('span');
-    usernameElement.className = 'header__user-name';
-    usernameElement.textContent = username;
-
-    const avatar = createUserAvatar(username);
-    avatar.className = 'header__user-avatar';
-
-    const logoutButton = createAuthButton('logout', onLogout);
-
-    user.append(usernameElement, avatar);
-    navActions.append(user, logoutButton);
-  } else {
-    const loginButton = createAuthButton('login', onLogin);
-    const signupButton = createAuthButton('signup', onSignup);
-
-    actions.append(loginButton, signupButton);
-    navActions.append(actions);
-  }
+  const actions = document.createElement('div');
+  actions.className = 'header__actions';
 
   const mobileMenu = createMobileMenu({
-    isAuthenticated,
+    isAuthenticated: auth.currentUser !== null,
     onLogin: () => {
       closeMenu(mobileMenu);
       onLogin();
@@ -87,11 +62,44 @@ export function createHeader({
   });
   burgerButton.classList.add('header__burger-menu');
 
-  navActions.append(burgerButton);
+  navActions.append(actions, burgerButton);
 
   document.body.append(mobileMenu);
 
   header.append(logo, navActions);
+
+  onAuthStateChanged(auth, (currentUser) => {
+    actions.replaceChildren();
+
+    const isAuthenticated = currentUser !== null;
+
+    if (isAuthenticated) {
+      const profileName =
+        currentUser.displayName?.trim() ||
+        currentUser.email?.split('@', 1)[0] ||
+        'User';
+
+      const user = document.createElement('div');
+      user.className = 'header__user';
+
+      const usernameElement = document.createElement('span');
+      usernameElement.className = 'header__user-name';
+      usernameElement.textContent = profileName;
+
+      const avatar = createUserAvatar(profileName, currentUser.photoURL);
+      avatar.className = 'header__user-avatar';
+
+      const logoutButton = createAuthButton('logout', onLogout);
+
+      user.append(usernameElement, avatar);
+      actions.append(user, logoutButton);
+    } else {
+      const loginButton = createAuthButton('login', onLogin);
+      const signupButton = createAuthButton('signup', onSignup);
+
+      actions.append(loginButton, signupButton);
+    }
+  });
 
   return header;
 }
