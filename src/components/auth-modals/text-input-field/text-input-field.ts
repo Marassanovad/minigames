@@ -17,6 +17,7 @@ interface TextInputFieldOptions {
   validate?: (value: string) => boolean;
   onChange?: (value: string) => void;
   onValidChange?: (isValid: boolean) => void;
+  readonly?: boolean;
 }
 
 export interface TextInputFieldElement extends HTMLDivElement {
@@ -64,6 +65,7 @@ export function createTextInputField({
   validate,
   onChange,
   onValidChange,
+  readonly = false,
 }: TextInputFieldOptions = {}): TextInputFieldElement {
   const container = document.createElement('div') as TextInputFieldElement;
 
@@ -91,6 +93,7 @@ export function createTextInputField({
   input.placeholder = placeholder;
   input.value = value;
   input.autocomplete = autocomplete ?? '';
+  input.readOnly = readonly ?? false;
 
   const errorMessageElement = document.createElement('span');
   errorMessageElement.className = 'text-input-field__error';

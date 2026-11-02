@@ -1,0 +1,39 @@
+{
+  "data": [
+    {
+      "id": "getting-started",
+      "name": "Getting Started",
+      "description": "Try out different games from the library.",
+      "condition": "Play 5 different games",
+      "icon": "/assets/images/achievements/getting-started.png"
+    },
+    {
+      "id": "dedicated-player",
+      "name": "Dedicated Player",
+      "description": "Keep your gaming streak alive.",
+      "condition": "Play 5 days in a row",
+      "icon": "/assets/images/achievements/dedicated-player.png"
+    },
+    {
+      "id": "weekly-explorer",
+      "name": "Weekly Explorer",
+      "description": "Explore the library every day for a week.",
+      "condition": "Play 7 days in a row",
+      "icon": "/assets/images/achievements/weekly-explorer.png"
+    },
+    {
+      "id": "game-collector",
+      "name": "Game Collector",
+      "description": "Build your personal game collection.",
+      "condition": "Add 4 games to your library",
+      "icon": "/assets/images/achievements/game-collector.png"
+    },
+    {
+      "id": "perfect-taste",
+      "name": "Perfect Taste",
+      "description": "Show some love to the games you enjoy.",
+      "condition": "Like 4 games",
+      "icon": "/assets/images/achievements/perfect-taste.png"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { renderHomePage } from '../pages/home/home-page';
 import { renderLibraryPage } from '../pages/library/library-page';
 import { renderNotFoundPage } from '../pages/not-found/not-found.ts';
+import { renderProfilePage } from '../pages/profile/profile-page.ts';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -10,6 +11,7 @@ const routes: Record<string, () => HTMLElement> = {
   '/': renderHomePage,
   '/home': renderHomePage,
   '/library': renderLibraryPage,
+  '/profile': renderProfilePage,
 };
 
 export interface RouteState {

@@ -1,0 +1,76 @@
+@use '../../../../styles/tokens' as *;
+
+.achievements {
+  width: 100%;
+  padding: $spacing-5 $spacing-15;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: $spacing-5;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: $spacing-1;
+
+    &-bar {
+      box-sizing: border-box;
+      width: $spacing-1;
+      height: $spacing-4;
+
+      background: $color-primary;
+      border: 1.5px solid $color-on-primary;
+      border-radius: $corner-extra-small;
+    }
+  }
+
+  &__list {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-2;
+  }
+
+  &__box {
+    position: relative;
+    cursor: pointer;
+
+    &:hover {
+      .achievements__tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  &__icon {
+    display: block;
+    width: 78px;
+    height: 78px;
+    object-fit: contain;
+  }
+
+  &__tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translate(-50%, 5px);
+    padding: $spacing-1 $spacing-3;
+    border-radius: $corner-medium;
+    background: $color-on-primary;
+    color: $color-white;
+    font-size: $font-size-label-medium;
+    white-space: nowrap;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.2s ease;
+  }
+
+  &__text {
+    color: $color-on-bg;
+    font-size: $font-size-label-small;
+  }
+}

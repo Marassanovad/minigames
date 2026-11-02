@@ -1,0 +1,38 @@
+@use '../../../../styles/tokens' as *;
+
+.games {
+  width: 100%;
+  padding: $spacing-5 $spacing-15;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: $spacing-5;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: $spacing-1;
+
+    &-bar {
+      box-sizing: border-box;
+      width: $spacing-1;
+      height: $spacing-4;
+
+      background: $color-primary;
+      border: 1.5px solid $color-on-primary;
+      border-radius: $corner-extra-small;
+    }
+  }
+
+  &__list {
+    display: flex;
+    gap: $spacing-2;
+  }
+}

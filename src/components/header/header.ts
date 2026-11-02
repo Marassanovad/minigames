@@ -79,8 +79,9 @@ export function createHeader({
         currentUser.email?.split('@', 1)[0] ||
         'User';
 
-      const user = document.createElement('div');
+      const user = document.createElement('a');
       user.className = 'header__user';
+      user.href = '/profile';
 
       const usernameElement = document.createElement('span');
       usernameElement.className = 'header__user-name';
